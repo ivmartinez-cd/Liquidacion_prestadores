@@ -1,5 +1,4 @@
 from typing import List, Dict, Any
-from sqlalchemy import or_
 from app.models.incidente import Incidente
 from app.models.tabla_km import TablaKM
 from app.core.evaluadores.base import EvaluadorBase
