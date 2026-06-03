@@ -1,4 +1,5 @@
 from typing import List, Dict, Any
+from sqlalchemy import or_
 from app.models.incidente import Incidente
 from app.models.tabla_km import TablaKM
 from app.core.evaluadores.base import EvaluadorBase
@@ -25,6 +26,16 @@ class EvaluadorALT005(EvaluadorBase):
         current_localidad = tabla.localidad_cliente
         current_spst_id = tabla.spst_id
 
+        # Build dynamic filters to avoid matching NULL/None values
+        conditions = []
+        if current_localidad and current_localidad.strip():
+            conditions.append(TablaKM.localidad_cliente == current_localidad)
+        if current_spst_id is not None:
+            conditions.append(TablaKM.spst_id == current_spst_id)
+
+        if not conditions:
+            return []
+
         # Find other same-day incidents in the same locality or SPST zone
         similares = (
             self.db.query(Incidente)
@@ -36,10 +47,7 @@ class EvaluadorALT005(EvaluadorBase):
                 Incidente.id != incidente.id,
                 Incidente.fecha_cierre == incidente.fecha_cierre,
             )
-            .filter(
-                (TablaKM.localidad_cliente == current_localidad) |
-                (TablaKM.spst_id == current_spst_id)
-            )
+            .filter(or_(*conditions))
             .all()
         )
 

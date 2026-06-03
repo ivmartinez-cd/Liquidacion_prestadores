@@ -1,4 +1,5 @@
 from typing import List, Dict, Any
+from sqlalchemy import or_
 from app.models.incidente import Incidente
 from app.models.tabla_km import TablaKM
 from app.core.evaluadores.base import EvaluadorBase
@@ -24,27 +25,31 @@ class EvaluadorALT002(EvaluadorBase):
                 current_localidad = tabla.localidad_cliente
                 current_spst_id = tabla.spst_id
                 
-                # Check same-day incidents in same locality/SPST with KMs cobrados > 0
-                other_incidents_with_km = (
-                    self.db.query(Incidente)
-                    .join(TablaKM, (TablaKM.prestador_id == self.prestador_id) & 
-                                   (TablaKM.empresa_nombre == Incidente.empresa_nombre) & 
-                                   (TablaKM.sucursal_nombre == Incidente.sucursal_nombre))
-                    .filter(
-                        Incidente.liquidacion_id == incidente.liquidacion_id,
-                        Incidente.id != incidente.id,
-                        Incidente.fecha_cierre == incidente.fecha_cierre,
-                        Incidente.cant_km_cobrado > 0,
+                conditions = []
+                if current_localidad and current_localidad.strip():
+                    conditions.append(TablaKM.localidad_cliente == current_localidad)
+                if current_spst_id is not None:
+                    conditions.append(TablaKM.spst_id == current_spst_id)
+
+                if conditions:
+                    # Check same-day incidents in same locality/SPST with KMs cobrados > 0
+                    other_incidents_with_km = (
+                        self.db.query(Incidente)
+                        .join(TablaKM, (TablaKM.prestador_id == self.prestador_id) & 
+                                       (TablaKM.empresa_nombre == Incidente.empresa_nombre) & 
+                                       (TablaKM.sucursal_nombre == Incidente.sucursal_nombre))
+                        .filter(
+                            Incidente.liquidacion_id == incidente.liquidacion_id,
+                            Incidente.id != incidente.id,
+                            Incidente.fecha_cierre == incidente.fecha_cierre,
+                            Incidente.cant_km_cobrado > 0,
+                        )
+                        .filter(or_(*conditions))
+                        .first()
                     )
-                    .filter(
-                        (TablaKM.localidad_cliente == current_localidad) |
-                        (TablaKM.spst_id == current_spst_id)
-                    )
-                    .first()
-                )
-                if other_incidents_with_km:
-                    # Correctly shared route, suppress KMs Incorrectos alert
-                    return []
+                    if other_incidents_with_km:
+                        # Correctly shared route, suppress KMs Incorrectos alert
+                        return []
 
             return [self._alerta(
                 f"KMs cobrados {cobrado} km difieren de la Tabla KM ({esperado} km) "
