@@ -14,7 +14,7 @@ start "Backend - Liquidaciones" cmd /k "cd /d "%~dp0backend" && set PYTHONUNBUFF
 timeout /t 3 /nobreak >nul
 
 echo Iniciando frontend (Next.js)...
-start "Frontend - Liquidaciones" cmd /k "cd /d "%~dp0frontend" && npm run dev"
+start "Frontend - Liquidaciones" cmd /k "cd /d "%~dp0frontend" && npm run dev -- -H 0.0.0.0"
 timeout /t 6 /nobreak >nul
 
 echo Abriendo en el navegador...

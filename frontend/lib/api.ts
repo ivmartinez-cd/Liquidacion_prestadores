@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:8002";
+const API_URL = typeof window !== "undefined"
+  ? `http://${window.location.hostname}:8002`
+  : "http://localhost:8002";
 
 async function fetchAPI(path: string, options?: RequestInit) {
   const res = await fetch(`${API_URL}${path}`, {
