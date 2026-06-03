@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { clsEstadoLiquidacion, formatMonto, formatFecha, labelRiesgo, clsRiesgo, TIPO_ALERTA_LABEL } from "@/lib/utils";
+import { clsEstadoLiquidacion, formatMonto, formatFecha } from "@/lib/utils";
 
 interface Stats {
   total_liquidaciones: number;

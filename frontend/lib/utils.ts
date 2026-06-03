@@ -1,27 +1,3 @@
-export function clsRiesgo(riesgo: number): string {
-  if (riesgo >= 150) return "bg-red-100 text-red-800 border-red-200";
-  if (riesgo >= 100) return "bg-orange-100 text-orange-800 border-orange-200";
-  if (riesgo >= 50) return "bg-yellow-100 text-yellow-800 border-yellow-200";
-  return "bg-green-100 text-green-800 border-green-200";
-}
-
-export function labelRiesgo(riesgo: number): string {
-  if (riesgo >= 150) return "Crítico";
-  if (riesgo >= 100) return "Alto";
-  if (riesgo >= 50) return "Medio";
-  return "Bajo";
-}
-
-export function clsEstadoAlerta(estado: string): string {
-  const map: Record<string, string> = {
-    pendiente: "bg-yellow-100 text-yellow-800",
-    en_revision: "bg-blue-100 text-blue-800",
-    resuelta: "bg-green-100 text-green-800",
-    descartada: "bg-gray-100 text-gray-600",
-  };
-  return map[estado] ?? "bg-gray-100 text-gray-600";
-}
-
 export function clsEstadoLiquidacion(estado: string): string {
   const map: Record<string, string> = {
     pendiente: "bg-yellow-100 text-yellow-800",
@@ -91,14 +67,4 @@ export function parseCSV(text: string): Record<string, string>[] {
   });
 }
 
-export const TIPO_ALERTA_LABEL: Record<string, string> = {
-  ALT001: "Precio Incorrecto",
-  ALT002: "KMs Incorrectos",
-  ALT003: "Viático Duplicado",
-  ALT004: "Servicio Duplicado",
-  ALT005: "Ruta Compartida",
-  ALT006: "Segunda Visita",
-  ALT007: "Agrupación",
-  ALT008: "Sin Tarifario",
-  ALT009: "Sin Tabla KM",
-};
+

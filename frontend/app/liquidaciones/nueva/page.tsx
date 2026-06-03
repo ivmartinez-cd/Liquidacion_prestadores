@@ -64,10 +64,6 @@ export default function NuevaLiquidacionPage() {
           <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
             <dt className="text-green-600">Incidentes procesados:</dt>
             <dd className="font-semibold text-green-800">{resultado.total_incidentes}</dd>
-            <dt className="text-green-600">Alertas generadas:</dt>
-            <dd className={`font-semibold ${resultado.total_alertas > 0 ? "text-red-700" : "text-green-800"}`}>
-              {resultado.total_alertas}
-            </dd>
           </dl>
         </div>
         <div className="flex gap-3">
@@ -77,14 +73,6 @@ export default function NuevaLiquidacionPage() {
           >
             Ver liquidación
           </button>
-          {resultado.total_alertas > 0 && (
-            <button
-              onClick={() => router.push(`/alertas?liquidacion_id=${resultado.liquidacion_id}`)}
-              className="flex-1 bg-red-600 text-white text-sm font-medium py-2 rounded-lg hover:bg-red-700"
-            >
-              Ver {resultado.total_alertas} alertas
-            </button>
-          )}
           <button
             onClick={() => setResultado(null)}
             className="px-4 text-sm text-gray-600 hover:text-gray-800"

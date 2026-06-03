@@ -103,22 +103,4 @@ export const api = {
     fetchAPI(`/liquidaciones/${id}`, { method: "DELETE" }),
   cambiarEstadoObservacion: (liqId: number, obsId: number, estado: string) =>
     fetchAPI(`/liquidaciones/${liqId}/observaciones/${obsId}/estado?estado=${encodeURIComponent(estado)}`, { method: "PUT" }),
-
-  // Alertas
-  getAlertas: (params?: Record<string, string>) => {
-    const q = params ? "?" + new URLSearchParams(params) : "";
-    return fetchAPI(`/alertas/${q}`);
-  },
-  getAlerta: (id: number) => fetchAPI(`/alertas/${id}`),
-  resolverAlerta: (id: number, d: unknown) =>
-    fetchAPI(`/alertas/${id}/resolver`, { method: "POST", body: JSON.stringify(d) }),
-  descartarAlerta: (id: number) =>
-    fetchAPI(`/alertas/${id}/descartar`, { method: "POST" }),
-  marcarEnRevision: (id: number) =>
-    fetchAPI(`/alertas/${id}/en-revision`, { method: "POST" }),
-
-  // Reglas
-  getReglas: () => fetchAPI("/reglas/"),
-  updateRegla: (codigo: string, d: unknown) =>
-    fetchAPI(`/reglas/${codigo}`, { method: "PUT", body: JSON.stringify(d) }),
 };

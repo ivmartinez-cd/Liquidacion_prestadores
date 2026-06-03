@@ -5,13 +5,11 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { href: "/", label: "Dashboard", icon: "📊" },
   { href: "/liquidaciones", label: "Liquidaciones", icon: "📄" },
-  { href: "/alertas", label: "Alertas", icon: "🔔" },
   { label: "Configuración", separator: true },
   { href: "/configuracion/prestadores", label: "Prestadores", icon: "🏢" },
   { href: "/configuracion/spst", label: "SPSTs", icon: "👷" },
   { href: "/configuracion/tarifarios", label: "Tarifarios", icon: "💰" },
   { href: "/configuracion/tabla-km", label: "Tabla KM", icon: "🗺️" },
-  { href: "/configuracion/reglas", label: "Reglas de Alerta", icon: "⚙️" },
 ];
 
 export default function Sidebar() {

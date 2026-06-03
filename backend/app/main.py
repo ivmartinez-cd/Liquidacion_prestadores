@@ -10,9 +10,7 @@ from app.api.routers import (
     tarifarios,
     tabla_km,
     liquidaciones,
-    alertas,
     dashboard,
-    reglas,
 )
 
 app = FastAPI(
@@ -41,9 +39,7 @@ app.include_router(spst.router)
 app.include_router(tarifarios.router)
 app.include_router(tabla_km.router)
 app.include_router(liquidaciones.router)
-app.include_router(alertas.router)
 app.include_router(dashboard.router)
-app.include_router(reglas.router)
 
 
 @app.get("/health")

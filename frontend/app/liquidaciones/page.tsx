@@ -61,7 +61,6 @@ export default function LiquidacionesPage() {
               <th className="px-4 py-3 text-left">Tipo</th>
               <th className="px-4 py-3 text-left">Estado</th>
               <th className="px-4 py-3 text-right">Incidentes</th>
-              <th className="px-4 py-3 text-right">Alertas</th>
               <th className="px-4 py-3 text-right">Importe</th>
               <th className="px-4 py-3 text-right">Fecha</th>
               <th className="px-4 py-3"></th>
@@ -105,15 +104,6 @@ export default function LiquidacionesPage() {
                   </span>
                 </td>
                 <td className="px-4 py-3 text-right text-gray-600">{l.total_incidentes}</td>
-                <td className="px-4 py-3 text-right">
-                  {l.total_alertas > 0 ? (
-                    <Link href={`/alertas?liquidacion_id=${l.id}`} className="text-red-600 font-semibold hover:underline">
-                      {l.total_alertas}
-                    </Link>
-                  ) : (
-                    <span className="text-green-600">0</span>
-                  )}
-                </td>
                 <td className="px-4 py-3 text-right text-gray-600">{formatMonto(l.total_importe)}</td>
                 <td className="px-4 py-3 text-right text-gray-400 text-xs">{formatFecha(l.fecha_importacion)}</td>
                 <td className="px-4 py-3 text-right">
