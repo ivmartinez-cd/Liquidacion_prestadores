@@ -39,3 +39,5 @@ app.include_router(dashboard.router)
 @app.get("/health")
 def health():
     return {"status": "ok", "version": "1.0.0"}
+
+
