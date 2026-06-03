@@ -19,6 +19,33 @@ class EvaluadorALT002(EvaluadorBase):
         tolerancia = config.get("tolerancia_km", 0.5)
 
         if abs(cobrado - esperado) > tolerancia:
+            # Check if this is a shared route where KMs were charged in another incident
+            if cobrado == 0 and esperado > 0:
+                current_localidad = tabla.localidad_cliente
+                current_spst_id = tabla.spst_id
+                
+                # Check same-day incidents in same locality/SPST with KMs cobrados > 0
+                other_incidents_with_km = (
+                    self.db.query(Incidente)
+                    .join(TablaKM, (TablaKM.prestador_id == self.prestador_id) & 
+                                   (TablaKM.empresa_nombre == Incidente.empresa_nombre) & 
+                                   (TablaKM.sucursal_nombre == Incidente.sucursal_nombre))
+                    .filter(
+                        Incidente.liquidacion_id == incidente.liquidacion_id,
+                        Incidente.id != incidente.id,
+                        Incidente.fecha_cierre == incidente.fecha_cierre,
+                        Incidente.cant_km_cobrado > 0,
+                    )
+                    .filter(
+                        (TablaKM.localidad_cliente == current_localidad) |
+                        (TablaKM.spst_id == current_spst_id)
+                    )
+                    .first()
+                )
+                if other_incidents_with_km:
+                    # Correctly shared route, suppress KMs Incorrectos alert
+                    return []
+
             return [self._alerta(
                 f"KMs cobrados {cobrado} km difieren de la Tabla KM ({esperado} km) "
                 f"para {incidente.empresa_nombre} — {incidente.sucursal_nombre}",

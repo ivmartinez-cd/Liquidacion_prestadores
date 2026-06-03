@@ -7,6 +7,7 @@ from app.core.evaluadores.alt001_precio import EvaluadorALT001
 from app.core.evaluadores.alt002_km import EvaluadorALT002
 from app.core.evaluadores.alt003_viatico import EvaluadorALT003
 from app.core.evaluadores.alt004_duplicado import EvaluadorALT004
+from app.core.evaluadores.alt005_ruta import EvaluadorALT005
 from app.core.evaluadores.alt008_tarifario import EvaluadorALT008
 from app.core.evaluadores.alt009_spst import EvaluadorALT009
 
@@ -15,6 +16,7 @@ EVALUADORES = {
     "ALT002": EvaluadorALT002,
     "ALT003": EvaluadorALT003,
     "ALT004": EvaluadorALT004,
+    "ALT005": EvaluadorALT005,
     "ALT008": EvaluadorALT008,
     "ALT009": EvaluadorALT009,
 }
