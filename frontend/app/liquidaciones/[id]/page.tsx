@@ -171,9 +171,8 @@ const IncidentTable = ({ titulo, incidentes, liqId }: { titulo: string, incident
               const tieneAlerta = inc.estado_validacion === "con_alertas";
               const costoDistinto = inc.costo_servicio_esperado !== null &&
                 Math.abs((inc.costo_servicio_cobrado || 0) - inc.costo_servicio_esperado) > 0.01;
-              const kmEsperadoIdaVuelta = inc.cant_km_esperado !== null ? inc.cant_km_esperado * 2 : null;
-              const kmDistinto = kmEsperadoIdaVuelta !== null &&
-                Math.abs((inc.cant_km_cobrado || 0) - kmEsperadoIdaVuelta) > 0.01;
+              const kmDistinto = inc.cant_km_esperado !== null &&
+                Math.abs((inc.cant_km_cobrado || 0) - inc.cant_km_esperado) > 0.01;
 
               return (
                 <tr key={inc.id} className="hover:bg-gray-50 text-gray-700">
@@ -199,8 +198,8 @@ const IncidentTable = ({ titulo, incidentes, liqId }: { titulo: string, incident
                   </td>
                   <td className={`px-4 py-2 text-right text-xs ${kmDistinto ? "text-red-600 font-semibold" : "text-gray-700"}`}>
                     {inc.cant_km_cobrado > 0 ? `${inc.cant_km_cobrado} km` : "—"}
-                    {kmDistinto && kmEsperadoIdaVuelta !== null && (
-                      <span className="block text-gray-400 font-normal">esp: {kmEsperadoIdaVuelta} km</span>
+                    {kmDistinto && inc.cant_km_esperado !== null && (
+                      <span className="block text-gray-400 font-normal">esp: {inc.cant_km_esperado} km</span>
                     )}
                   </td>
                   <td className="px-4 py-2 text-right text-xs font-medium text-gray-800">

@@ -3,7 +3,8 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import io
-from datetime import date
+from datetime import date, timedelta
+
 
 from app.database import get_db
 from app.models.tarifario import Tarifario
@@ -61,6 +62,26 @@ def _str(v) -> Optional[str]:
         return None
     s = str(v).strip()
     return s if s and s.lower() not in ("nan", "none", "") else None
+
+
+def _rebuild_temporal_chain(db: Session, prestador_id: int, tipo_servicio: str, zona: Optional[str] = None):
+    tarifas = (
+        db.query(Tarifario)
+        .filter(
+            Tarifario.prestador_id == prestador_id,
+            Tarifario.tipo_servicio == tipo_servicio,
+            Tarifario.zona == zona,
+        )
+        .order_by(Tarifario.vigencia_desde.asc())
+        .all()
+    )
+    for i in range(len(tarifas) - 1):
+        tarifas[i].vigencia_hasta = tarifas[i+1].vigencia_desde - timedelta(days=1)
+    if tarifas:
+        # Asegurar que el último no se pise si ya tenía algo distinto, pero si no tiene nada queda None.
+        # En caso de importar nuevo más reciente, el anterior se cierra y el nuevo queda abierto (None).
+        # Si el usuario agregó uno en el medio, se cerrará con el siguiente.
+        pass
 
 
 def _build_plantilla() -> io.BytesIO:
@@ -242,6 +263,7 @@ async def importar_excel(
     }
 
     creados = omitidos = errores = 0
+    rebuild_keys = set()
 
     for row in ws.iter_rows(min_row=header_row + 1, values_only=True):
         raw_tipo = _str(row[ci_tipo - 1]) if ci_tipo else None
@@ -299,9 +321,13 @@ async def importar_excel(
             db.add(t)
             existing.add(key)
             creados += 1
+            rebuild_keys.add((prestador_id, tipo, zona))
         except Exception:
             errores += 1
 
+    db.flush()
+    for pid, t_serv, z in rebuild_keys:
+        _rebuild_temporal_chain(db, pid, t_serv, z)
     db.commit()
     return {
         "prestador": nombre_corto,
@@ -325,6 +351,8 @@ def list_tarifarios(prestador_id: Optional[int] = None, db: Session = Depends(ge
 def create_tarifario(data: TarifarioCreate, db: Session = Depends(get_db)):
     t = Tarifario(**data.model_dump())
     db.add(t)
+    db.flush()
+    _rebuild_temporal_chain(db, t.prestador_id, t.tipo_servicio, t.zona)
     db.commit()
     db.refresh(t)
     return t
@@ -343,8 +371,19 @@ def update_tarifario(id: int, data: TarifarioUpdate, db: Session = Depends(get_d
     t = db.query(Tarifario).filter(Tarifario.id == id).first()
     if not t:
         raise HTTPException(status_code=404, detail="Tarifario no encontrado")
+    
+    old_prestador_id = t.prestador_id
+    old_tipo = t.tipo_servicio
+    old_zona = t.zona
+
     for k, v in data.model_dump(exclude_none=True).items():
         setattr(t, k, v)
+        
+    db.flush()
+    _rebuild_temporal_chain(db, old_prestador_id, old_tipo, old_zona)
+    if (t.prestador_id != old_prestador_id or t.tipo_servicio != old_tipo or t.zona != old_zona):
+        _rebuild_temporal_chain(db, t.prestador_id, t.tipo_servicio, t.zona)
+        
     db.commit()
     db.refresh(t)
     return t
@@ -355,5 +394,13 @@ def delete_tarifario(id: int, db: Session = Depends(get_db)):
     t = db.query(Tarifario).filter(Tarifario.id == id).first()
     if not t:
         raise HTTPException(status_code=404, detail="Tarifario no encontrado")
+    
+    prestador_id = t.prestador_id
+    tipo_servicio = t.tipo_servicio
+    zona = t.zona
+
     db.delete(t)
+    db.flush()
+    _rebuild_temporal_chain(db, prestador_id, tipo_servicio, zona)
     db.commit()
+
