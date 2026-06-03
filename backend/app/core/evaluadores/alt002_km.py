@@ -23,16 +23,9 @@ class EvaluadorALT002(EvaluadorBase):
             # Check if this is a shared route where KMs were charged in another incident
             if cobrado == 0 and esperado > 0:
                 current_localidad = tabla.localidad_cliente
-                current_spst_id = tabla.spst_id
                 
-                conditions = []
                 if current_localidad and current_localidad.strip():
-                    conditions.append(TablaKM.localidad_cliente == current_localidad)
-                if current_spst_id is not None:
-                    conditions.append(TablaKM.spst_id == current_spst_id)
-
-                if conditions:
-                    # Check same-day incidents in same locality/SPST with KMs cobrados > 0
+                    # Check same-day incidents in same locality with KMs cobrados > 0
                     other_incidents_with_km = (
                         self.db.query(Incidente)
                         .join(TablaKM, (TablaKM.prestador_id == self.prestador_id) & 
@@ -43,8 +36,8 @@ class EvaluadorALT002(EvaluadorBase):
                             Incidente.id != incidente.id,
                             Incidente.fecha_cierre == incidente.fecha_cierre,
                             Incidente.cant_km_cobrado > 0,
+                            TablaKM.localidad_cliente.ilike(current_localidad.strip()),
                         )
-                        .filter(or_(*conditions))
                         .first()
                     )
                     if other_incidents_with_km:

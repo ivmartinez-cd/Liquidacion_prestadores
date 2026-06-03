@@ -24,19 +24,11 @@ class EvaluadorALT005(EvaluadorBase):
             return []
 
         current_localidad = tabla.localidad_cliente
-        current_spst_id = tabla.spst_id
 
-        # Build dynamic filters to avoid matching NULL/None values
-        conditions = []
-        if current_localidad and current_localidad.strip():
-            conditions.append(TablaKM.localidad_cliente == current_localidad)
-        if current_spst_id is not None:
-            conditions.append(TablaKM.spst_id == current_spst_id)
-
-        if not conditions:
+        if not current_localidad or not current_localidad.strip():
             return []
 
-        # Find other same-day incidents in the same locality or SPST zone
+        # Find other same-day incidents in the same locality
         similares = (
             self.db.query(Incidente)
             .join(TablaKM, (TablaKM.prestador_id == self.prestador_id) & 
@@ -46,8 +38,8 @@ class EvaluadorALT005(EvaluadorBase):
                 Incidente.liquidacion_id == incidente.liquidacion_id,
                 Incidente.id != incidente.id,
                 Incidente.fecha_cierre == incidente.fecha_cierre,
+                TablaKM.localidad_cliente.ilike(current_localidad.strip()),
             )
-            .filter(or_(*conditions))
             .all()
         )
 
