@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime, date
 from typing import Optional, List
+from app.schemas.alerta import AlertaResponse
 
 
 class IncidenteResumen(BaseModel):
@@ -18,6 +19,7 @@ class IncidenteResumen(BaseModel):
     cant_km_esperado: Optional[float]
     costo_total_cobrado: float
     estado_validacion: str
+    alertas: List[AlertaResponse] = []
 
 
 class LiquidacionListResponse(BaseModel):

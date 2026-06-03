@@ -4,22 +4,8 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { clsEstadoLiquidacion, formatMonto } from "@/lib/utils";
-
-interface Incidente {
-  id: number;
-  numero_incidente: string;
-  tipo: string;
-  empresa_nombre: string;
-  sucursal_nombre: string;
-  nro_serie: string;
-  fecha_cierre: string;
-  costo_servicio_cobrado: number;
-  costo_servicio_esperado: number | null;
-  cant_km_cobrado: number;
-  cant_km_esperado: number | null;
-  costo_total_cobrado: number;
-  estado_validacion: string;
-}
+import { AlertsModal } from "@/components/ui/AlertsModal";
+import type { Alerta, Incidente } from "@/components/ui/AlertsModal";
 
 interface Liquidacion {
   id: number;
@@ -40,6 +26,8 @@ export default function LiquidacionDetailPage() {
   const [liq, setLiq] = useState<Liquidacion | null>(null);
   const [loading, setLoading] = useState(true);
   const [reanalizing, setReanalizing] = useState(false);
+  const [selectedIncidenteId, setSelectedIncidenteId] = useState<number | null>(null);
+  const selectedIncidente = selectedIncidenteId ? liq?.incidentes.find((i) => i.id === selectedIncidenteId) || null : null;
 
   const load = () => {
     setLoading(true);
@@ -120,21 +108,32 @@ export default function LiquidacionDetailPage() {
         titulo="Correctivos, Pre-correctivos e Instalaciones" 
         incidentes={liq.incidentes.filter(i => i.tipo.toLowerCase() !== "preventivo")} 
         liqId={liq.id} 
+        onShowAlerts={(inc) => setSelectedIncidenteId(inc.id)}
       />
       
       <IncidentTable 
         titulo="Preventivos" 
         incidentes={liq.incidentes.filter(i => i.tipo.toLowerCase() === "preventivo")} 
         liqId={liq.id} 
+        onShowAlerts={(inc) => setSelectedIncidenteId(inc.id)}
       />
 
       {/* Modelo de Facturación */}
       <ModeloFacturacion incidentes={liq.incidentes} />
+
+      {/* Alertas Modal */}
+      {selectedIncidente && (
+        <AlertsModal 
+          incidente={selectedIncidente} 
+          onClose={() => setSelectedIncidenteId(null)} 
+          onRefresh={load} 
+        />
+      )}
     </div>
   );
 }
 
-const IncidentTable = ({ titulo, incidentes, liqId }: { titulo: string, incidentes: Incidente[], liqId: number }) => {
+const IncidentTable = ({ titulo, incidentes, liqId, onShowAlerts }: { titulo: string, incidentes: Incidente[], liqId: number, onShowAlerts: (inc: Incidente) => void }) => {
   const conAlertas = incidentes.filter((i) => i.estado_validacion === "con_alertas");
   
   if (incidentes.length === 0) return null;
@@ -209,10 +208,12 @@ const IncidentTable = ({ titulo, incidentes, liqId }: { titulo: string, incident
                     {inc.estado_validacion === "pendiente" ? (
                       <span className="text-xs text-gray-400">—</span>
                     ) : tieneAlerta ? (
-                      <Link href={`/alertas?liquidacion_id=${liqId}`}
-                        className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full hover:bg-red-200">
-                        Alertas
-                      </Link>
+                      <button
+                        onClick={() => onShowAlerts(inc)}
+                        className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full hover:bg-red-200"
+                      >
+                        Alertas ({inc.alertas?.length || 0})
+                      </button>
                     ) : (
                       <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">OK</span>
                     )}
