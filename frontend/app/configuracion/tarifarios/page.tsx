@@ -74,7 +74,25 @@ export default function TarifariosPage() {
   const [importando, setImportando] = useState(false);
   const [expandedHistories, setExpandedHistories] = useState<Record<string, boolean>>({});
   const [expandedPrestadores, setExpandedPrestadores] = useState<Record<number, boolean>>({});
+  const [availableZones, setAvailableZones] = useState<string[]>([]);
   const xlsxRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!form.prestador_id) {
+      setAvailableZones([]);
+      return;
+    }
+    api.getSPSTs(Number(form.prestador_id))
+      .then((data: any) => {
+        if (Array.isArray(data)) {
+          const zones = Array.from(new Set(data.map((s: any) => s.zona).filter(Boolean))) as string[];
+          setAvailableZones(zones.sort());
+        }
+      })
+      .catch(() => {
+        setAvailableZones([]);
+      });
+  }, [form.prestador_id]);
 
   const load = () => api.getTarifarios(filtroP ? Number(filtroP) : undefined).then(setItems);
   useEffect(() => { api.getPrestadores().then(setPrestadores); }, []);
@@ -607,11 +625,17 @@ export default function TarifariosPage() {
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Zona (Opcional)</label>
                     <input 
+                      list="available-zones"
                       value={form.zona} 
                       onChange={(e) => setForm({ ...form, zona: e.target.value })}
                       placeholder="Vacío = Toda la cobertura"
                       className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white" 
                     />
+                    <datalist id="available-zones">
+                      {availableZones.map((z) => (
+                        <option key={z} value={z} />
+                      ))}
+                    </datalist>
                   </div>
                 </div>
 
