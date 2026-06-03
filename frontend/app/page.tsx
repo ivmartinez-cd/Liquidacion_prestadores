@@ -7,9 +7,8 @@ import { clsEstadoLiquidacion, formatMonto, formatFecha, labelRiesgo, clsRiesgo,
 interface Stats {
   total_liquidaciones: number;
   liquidaciones_pendientes: number;
-  alertas_abiertas: number;
-  alertas_criticas: number;
-  alertas_por_tipo: { tipo: string; total: number }[];
+  total_incidentes: number;
+  total_importe: number;
   recientes: {
     id: number;
     prestador: string;
@@ -17,7 +16,6 @@ interface Stats {
     tipo: string;
     estado: string;
     total_incidentes: number;
-    total_alertas: number;
     total_importe: number;
     fecha: string;
   }[];
@@ -40,7 +38,7 @@ export default function Dashboard() {
   useEffect(() => {
     api.getStats()
       .then(setStats)
-      .catch(() => setError("No se pudo conectar al backend. Verificá que esté corriendo en puerto 8000."));
+      .catch(() => setError("No se pudo conectar al backend. Verificá que esté corriendo en puerto 8002."));
   }, []);
 
   if (error) {
@@ -59,13 +57,21 @@ export default function Dashboard() {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h2 className="text-xl font-bold text-gray-800">Dashboard</h2>
-        <p className="text-sm text-gray-500">Estado actual del proceso de validación</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-gray-800">Dashboard</h2>
+          <p className="text-sm text-gray-500">Estado actual del proceso de liquidaciones</p>
+        </div>
+        <Link
+          href="/liquidaciones/nueva"
+          className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          + Importar liquidación
+        </Link>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard
           label="Liquidaciones pendientes"
           value={stats.liquidaciones_pendientes}
@@ -73,115 +79,76 @@ export default function Dashboard() {
           color="bg-yellow-50 border-yellow-200 text-yellow-900"
         />
         <StatCard
-          label="Alertas abiertas"
-          value={stats.alertas_abiertas}
+          label="Total importadas"
+          value={stats.total_liquidaciones}
           color="bg-blue-50 border-blue-200 text-blue-900"
         />
         <StatCard
-          label="Alertas críticas"
-          value={stats.alertas_criticas}
-          sub="riesgo ≥ 150"
-          color="bg-red-50 border-red-200 text-red-900"
+          label="Total incidentes"
+          value={stats.total_incidentes || 0}
+          color="bg-emerald-50 border-emerald-200 text-emerald-900"
         />
         <StatCard
-          label="Total importadas"
-          value={stats.total_liquidaciones}
+          label="Total facturado"
+          value={formatMonto(stats.total_importe || 0)}
           color="bg-gray-100 border-gray-200 text-gray-800"
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recientes */}
-        <div className="lg:col-span-2 bg-white border border-gray-200 rounded-lg">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-            <h3 className="font-semibold text-sm text-gray-700">Últimas liquidaciones</h3>
-            <Link href="/liquidaciones" className="text-xs text-blue-600 hover:underline">Ver todas</Link>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-gray-50 text-xs text-gray-500 uppercase">
-                  <th className="px-4 py-2 text-left">PST</th>
-                  <th className="px-4 py-2 text-left">Período</th>
-                  <th className="px-4 py-2 text-left">Estado</th>
-                  <th className="px-4 py-2 text-right">Alertas</th>
-                  <th className="px-4 py-2 text-right">Importe</th>
-                  <th className="px-4 py-2 text-right">Importado</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {stats.recientes.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-6 text-center text-gray-400 text-xs">
-                      Aún no hay liquidaciones importadas.{" "}
-                      <Link href="/liquidaciones/nueva" className="text-blue-600 hover:underline">Importar primera liquidación</Link>
-                    </td>
-                  </tr>
-                )}
-                {stats.recientes.map((l) => (
-                  <tr key={l.id} className="hover:bg-gray-50 cursor-pointer">
-                    <td className="px-4 py-2.5">
-                      <Link href={`/liquidaciones/${l.id}`} className="font-medium text-gray-800 hover:text-blue-600">
-                        {l.prestador}
-                      </Link>
-                      {l.tipo !== "regular" && (
-                        <span className="ml-1.5 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
-                          {l.tipo}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-2.5 text-gray-600">{l.periodo}</td>
-                    <td className="px-4 py-2.5">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${clsEstadoLiquidacion(l.estado)}`}>
-                        {l.estado}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2.5 text-right">
-                      {l.total_alertas > 0 ? (
-                        <Link href={`/alertas?liquidacion_id=${l.id}`} className="text-red-600 font-semibold hover:underline">
-                          {l.total_alertas}
-                        </Link>
-                      ) : (
-                        <span className="text-green-600 font-medium">0</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-2.5 text-right text-gray-600">{formatMonto(l.total_importe)}</td>
-                    <td className="px-4 py-2.5 text-right text-gray-400 text-xs">{formatFecha(l.fecha)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+      {/* Recientes */}
+      <div className="bg-white border border-gray-200 rounded-lg">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+          <h3 className="font-semibold text-sm text-gray-700">Últimas liquidaciones</h3>
+          <Link href="/liquidaciones" className="text-xs text-blue-600 hover:underline">Ver todas</Link>
         </div>
-
-        {/* Alertas por tipo */}
-        <div className="bg-white border border-gray-200 rounded-lg">
-          <div className="px-4 py-3 border-b border-gray-100">
-            <h3 className="font-semibold text-sm text-gray-700">Alertas abiertas por tipo</h3>
-          </div>
-          <div className="p-4 space-y-3">
-            {stats.alertas_por_tipo.length === 0 && (
-              <p className="text-xs text-gray-400 text-center py-4">Sin alertas pendientes</p>
-            )}
-            {stats.alertas_por_tipo.map((a) => (
-              <Link
-                key={a.tipo}
-                href={`/alertas?tipo_alerta=${a.tipo}&estado=pendiente`}
-                className="flex items-center justify-between hover:bg-gray-50 rounded p-1.5 -mx-1.5"
-              >
-                <span className="text-sm text-gray-700">{TIPO_ALERTA_LABEL[a.tipo] ?? a.tipo}</span>
-                <span className="text-sm font-bold text-gray-800">{a.total}</span>
-              </Link>
-            ))}
-          </div>
-          <div className="px-4 pb-4">
-            <Link
-              href="/liquidaciones/nueva"
-              className="block w-full text-center bg-blue-600 text-white text-sm font-medium py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              + Importar liquidación
-            </Link>
-          </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50 text-xs text-gray-500 uppercase">
+                <th className="px-4 py-2 text-left">Prestador</th>
+                <th className="px-4 py-2 text-left">Período</th>
+                <th className="px-4 py-2 text-left">Estado</th>
+                <th className="px-4 py-2 text-right">Incidentes</th>
+                <th className="px-4 py-2 text-right">Importe</th>
+                <th className="px-4 py-2 text-right">Fecha de Carga</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {stats.recientes.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-4 py-6 text-center text-gray-400 text-xs">
+                    Aún no hay liquidaciones importadas.{" "}
+                    <Link href="/liquidaciones/nueva" className="text-blue-600 hover:underline">Importar primera liquidación</Link>
+                  </td>
+                </tr>
+              )}
+              {stats.recientes.map((l) => (
+                <tr key={l.id} className="hover:bg-gray-50 cursor-pointer">
+                  <td className="px-4 py-2.5">
+                    <Link href={`/liquidaciones/${l.id}`} className="font-medium text-gray-800 hover:text-blue-600">
+                      {l.prestador}
+                    </Link>
+                    {l.tipo !== "regular" && (
+                      <span className="ml-1.5 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+                        {l.tipo}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-2.5 text-gray-600">{l.periodo}</td>
+                  <td className="px-4 py-2.5">
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${clsEstadoLiquidacion(l.estado)}`}>
+                      {l.estado}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5 text-right font-medium text-gray-700">
+                    {l.total_incidentes}
+                  </td>
+                  <td className="px-4 py-2.5 text-right font-semibold text-gray-800">{formatMonto(l.total_importe)}</td>
+                  <td className="px-4 py-2.5 text-right text-gray-400 text-xs">{formatFecha(l.fecha)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

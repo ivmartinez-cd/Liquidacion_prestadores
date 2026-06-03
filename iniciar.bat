@@ -10,7 +10,7 @@ powershell -NoProfile -Command "Get-WmiObject Win32_Process | Where-Object { $_.
 timeout /t 2 /nobreak >nul
 
 echo Iniciando backend (FastAPI)...
-start "Backend - Liquidaciones" cmd /k "cd /d "%~dp0backend" && set PYTHONUNBUFFERED=1 && python -m uvicorn app.main:app --host 0.0.0.0 --port 8002"
+start "Backend - Liquidaciones" cmd /k "cd /d "%~dp0backend" && set PYTHONUNBUFFERED=1 && ..\.venv\Scripts\python.exe -m uvicorn app.main:app --host 0.0.0.0 --port 8002"
 timeout /t 3 /nobreak >nul
 
 echo Iniciando frontend (Next.js)...
