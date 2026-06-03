@@ -4,17 +4,22 @@ echo  Asistente de Liquidaciones de Prestadores
 echo ============================================
 echo.
 
-echo Liberando puertos...
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8001 " ^| findstr LISTENING 2^>nul') do (
-    taskkill /PID %%a /F >nul 2>&1
-)
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":3000 " ^| findstr LISTENING 2^>nul') do (
-    taskkill /PID %%a /F >nul 2>&1
-)
+echo Cerrando instancias anteriores...
+taskkill /FI "WINDOWTITLE eq Backend - Liquidaciones" /F /T >nul 2>&1
+taskkill /FI "WINDOWTITLE eq Frontend - Liquidaciones" /F /T >nul 2>&1
 timeout /t 1 /nobreak >nul
 
+echo Liberando puertos...
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8001 " ^| findstr LISTENING 2^>nul') do (
+    taskkill /PID %%a /F /T >nul 2>&1
+)
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":3000 " ^| findstr LISTENING 2^>nul') do (
+    taskkill /PID %%a /F /T >nul 2>&1
+)
+timeout /t 2 /nobreak >nul
+
 echo Iniciando backend (FastAPI)...
-start "Backend - Liquidaciones" cmd /k "cd /d "%~dp0backend" && uvicorn app.main:app --reload --host 0.0.0.0 --port 8001"
+start "Backend - Liquidaciones" cmd /k "cd /d "%~dp0backend" && set PYTHONUNBUFFERED=1 && uvicorn app.main:app --host 0.0.0.0 --port 8001"
 timeout /t 3 /nobreak >nul
 
 echo Iniciando frontend (Next.js)...

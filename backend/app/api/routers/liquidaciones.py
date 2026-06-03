@@ -40,6 +40,12 @@ async def importar_liquidacion(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+    # DEBUG TEMPORAL
+    if datos["incidentes"]:
+        sample = datos["incidentes"][0]
+        print(f"[DEBUG IMPORT] primer incidente: {sample['numero_incidente']} | fecha_cierre={sample['fecha_cierre']!r}")
+    # FIN DEBUG
+
     liq = Liquidacion(
         prestador_id=prestador_id,
         numero_liquidacion=datos["numero_liquidacion"],

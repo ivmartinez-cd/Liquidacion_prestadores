@@ -25,7 +25,7 @@ def _parse_fecha(valor: Any) -> Optional[date]:
     s = str(valor).strip()
     if s in ("", "nan", "None"):
         return None
-    for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y", "%d/%m/%y"):
+    for fmt in ("%Y%m%d", "%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y", "%d/%m/%y"):
         try:
             return datetime.strptime(s, fmt).date()
         except ValueError:
