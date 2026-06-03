@@ -3,3 +3,19 @@ node_modules/
 dist/
 .env*
 .DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Databases
+backend/liquidaciones.db
+*.db
+
+# Build artifacts
+*.tsbuildinfo
+
+# Excel data files
+*.xls
+*.xlsx
