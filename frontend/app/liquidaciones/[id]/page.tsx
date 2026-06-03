@@ -321,100 +321,100 @@ const ModeloFacturacion = ({ incidentes }: { incidentes: Incidente[] }) => {
   const totalGeneral = incidentes.reduce((acc, i) => acc + (i.costo_total_cobrado || 0), 0);
 
   return (
-    <div className="bg-white border border-gray-400 rounded-lg overflow-hidden mb-6 shadow-sm">
-      <div className="bg-[#ffcc99] px-4 py-2 text-center border-b border-gray-400">
-        <h3 className="font-bold text-sm text-black tracking-wide m-0">MODELO FACTURACION</h3>
+    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden mb-6 shadow-sm">
+      <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+        <h3 className="font-semibold text-sm text-gray-700">Modelo Facturación</h3>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
-          <thead className="bg-[#ffcc99] text-black font-bold border-b-2 border-black">
-            <tr>
-              <th className="px-4 py-2 border-r border-gray-400 w-16 text-center">ITEM</th>
-              <th className="px-4 py-2 border-r border-gray-400 text-center">DESCRIPCION</th>
-              <th className="px-4 py-2 border-r border-gray-400 text-center w-24">Cant</th>
-              <th className="px-4 py-2 border-r border-gray-400 text-center w-32">$ Unit</th>
-              <th className="px-4 py-2 text-center w-32">Total</th>
+          <thead>
+            <tr className="bg-gray-50 text-xs text-gray-500 uppercase border-b border-gray-200">
+              <th className="px-4 py-2.5 w-16 text-center">ITEM</th>
+              <th className="px-4 py-2.5 text-left">DESCRIPCION</th>
+              <th className="px-4 py-2.5 text-center w-24">Cant</th>
+              <th className="px-4 py-2.5 text-right w-32">$ Unit</th>
+              <th className="px-4 py-2.5 text-right w-32">Total</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-300 bg-[#ffe6cc] font-medium text-black">
+          <tbody className="divide-y divide-gray-100 text-gray-700">
             {/* ITEM 1 - CORRECTIVOS */}
-            <tr>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center font-bold">1</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 font-bold uppercase text-center">Correctivos</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center">{corrCant}</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 flex justify-between"><span>$</span> <span>{formatMonto(corrUnit).replace('$', '')}</span></td>
-              <td className="px-4 py-1.5 font-bold"><div className="flex justify-between"><span>$</span> <span>{formatMonto(corrTotalServ).replace('$', '')}</span></div></td>
+            <tr className="hover:bg-slate-50/50">
+              <td className="px-4 py-2.5 text-center font-bold text-gray-900 border-r border-gray-100 bg-slate-50/30">1</td>
+              <td className="px-4 py-2.5 font-bold uppercase text-gray-900">Correctivos</td>
+              <td className="px-4 py-2.5 text-center font-semibold">{corrCant}</td>
+              <td className="px-4 py-2.5 text-right font-mono">{formatMonto(corrUnit)}</td>
+              <td className="px-4 py-2.5 text-right font-bold text-gray-900 font-mono">{formatMonto(corrTotalServ)}</td>
             </tr>
-            <tr>
-              <td className="px-4 py-1.5 border-r border-gray-400"></td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center font-semibold">viatico</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center">{corrKmCant}</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 flex justify-between"><span>$</span> <span>{formatMonto(corrKmUnit).replace('$', '')}</span></td>
-              <td className="px-4 py-1.5 font-bold"><div className="flex justify-between"><span>$</span> <span>{formatMonto(corrKmTotal).replace('$', '')}</span></div></td>
+            <tr className="hover:bg-slate-50/50">
+              <td className="px-4 py-2.5 text-center border-r border-gray-100 bg-slate-50/30"></td>
+              <td className="px-4 py-2.5 pl-8 text-gray-500 font-medium">viático</td>
+              <td className="px-4 py-2.5 text-center text-gray-600">{corrKmCant}</td>
+              <td className="px-4 py-2.5 text-right text-gray-600 font-mono">{formatMonto(corrKmUnit)}</td>
+              <td className="px-4 py-2.5 text-right font-semibold text-gray-800 font-mono">{formatMonto(corrKmTotal)}</td>
             </tr>
-            <tr>
-              <td className="px-4 py-1.5 border-r border-gray-400"></td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center font-semibold">Costo viejo</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center">0</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 flex justify-between"><span>$</span> <span>0,00</span></td>
-              <td className="px-4 py-1.5 text-center text-black font-bold"><div className="flex justify-between"><span>$</span> <span>-</span></div></td>
+            <tr className="text-gray-400 opacity-60 bg-gray-50/30 hover:bg-slate-50/50">
+              <td className="px-4 py-2.5 text-center border-r border-gray-100 bg-slate-50/30"></td>
+              <td className="px-4 py-2.5 pl-8 italic">Costo viejo</td>
+              <td className="px-4 py-2.5 text-center">0</td>
+              <td className="px-4 py-2.5 text-right font-mono">$ 0,00</td>
+              <td className="px-4 py-2.5 text-right font-mono">—</td>
             </tr>
-            <tr>
-              <td className="px-4 py-1.5 border-r border-gray-400"></td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center font-semibold">viatico</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center">0</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 flex justify-between"><span>$</span> <span>0,00</span></td>
-              <td className="px-4 py-1.5 text-center text-black font-bold"><div className="flex justify-between"><span>$</span> <span>-</span></div></td>
+            <tr className="text-gray-400 opacity-60 bg-gray-50/30 hover:bg-slate-50/50">
+              <td className="px-4 py-2.5 text-center border-r border-gray-100 bg-slate-50/30"></td>
+              <td className="px-4 py-2.5 pl-8 italic">viático</td>
+              <td className="px-4 py-2.5 text-center">0</td>
+              <td className="px-4 py-2.5 text-right font-mono">$ 0,00</td>
+              <td className="px-4 py-2.5 text-right font-mono">—</td>
             </tr>
-            <tr>
-              <td className="px-4 py-1.5 border-r border-gray-400"></td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center font-semibold">Inc Doble</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center">0</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 flex justify-between"><span>$</span> <span>0,00</span></td>
-              <td className="px-4 py-1.5 text-center text-black font-bold"><div className="flex justify-between"><span>$</span> <span>-</span></div></td>
+            <tr className="text-gray-400 opacity-60 bg-gray-50/30 hover:bg-slate-50/50">
+              <td className="px-4 py-2.5 text-center border-r border-gray-100 bg-slate-50/30"></td>
+              <td className="px-4 py-2.5 pl-8 italic">Inc Doble</td>
+              <td className="px-4 py-2.5 text-center">0</td>
+              <td className="px-4 py-2.5 text-right font-mono">$ 0,00</td>
+              <td className="px-4 py-2.5 text-right font-mono">—</td>
             </tr>
 
             {/* ITEM 2 - PREVENTIVOS */}
-            <tr className="border-t border-gray-400">
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center font-bold">2</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 font-bold uppercase text-center">Preventivos</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center">{prevCant}</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 flex justify-between"><span>$</span> <span>{formatMonto(prevUnit).replace('$', '')}</span></td>
-              <td className="px-4 py-1.5 font-bold"><div className="flex justify-between"><span>$</span> <span>{formatMonto(prevTotalServ).replace('$', '')}</span></div></td>
+            <tr className="hover:bg-slate-50/50 border-t border-gray-200">
+              <td className="px-4 py-2.5 text-center font-bold text-gray-900 border-r border-gray-100 bg-slate-50/30">2</td>
+              <td className="px-4 py-2.5 font-bold uppercase text-gray-900">Preventivos</td>
+              <td className="px-4 py-2.5 text-center font-semibold">{prevCant}</td>
+              <td className="px-4 py-2.5 text-right font-mono">{formatMonto(prevUnit)}</td>
+              <td className="px-4 py-2.5 text-right font-bold text-gray-900 font-mono">{formatMonto(prevTotalServ)}</td>
             </tr>
-            <tr>
-              <td className="px-4 py-1.5 border-r border-gray-400"></td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center font-semibold">Costo viejo</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center">0</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 flex justify-between"><span>$</span> <span>0,00</span></td>
-              <td className="px-4 py-1.5 text-center text-black font-bold"><div className="flex justify-between"><span>$</span> <span>-</span></div></td>
+            <tr className="text-gray-400 opacity-60 bg-gray-50/30 hover:bg-slate-50/50">
+              <td className="px-4 py-2.5 text-center border-r border-gray-100 bg-slate-50/30"></td>
+              <td className="px-4 py-2.5 pl-8 italic">Costo viejo</td>
+              <td className="px-4 py-2.5 text-center">0</td>
+              <td className="px-4 py-2.5 text-right font-mono">$ 0,00</td>
+              <td className="px-4 py-2.5 text-right font-mono">—</td>
             </tr>
-            <tr>
-              <td className="px-4 py-1.5 border-r border-gray-400"></td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center font-semibold">viatico</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center">{prevKmCant}</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 flex justify-between"><span>$</span> <span>{formatMonto(prevKmUnit).replace('$', '')}</span></td>
-              <td className="px-4 py-1.5"><div className="flex justify-between font-bold"><span>$</span> <span>{prevKmTotal > 0 ? formatMonto(prevKmTotal).replace('$', '') : '-'}</span></div></td>
+            <tr className="hover:bg-slate-50/50">
+              <td className="px-4 py-2.5 text-center border-r border-gray-100 bg-slate-50/30"></td>
+              <td className="px-4 py-2.5 pl-8 text-gray-500 font-medium">viático</td>
+              <td className="px-4 py-2.5 text-center text-gray-600">{prevKmCant}</td>
+              <td className="px-4 py-2.5 text-right text-gray-600 font-mono">{formatMonto(prevKmUnit)}</td>
+              <td className="px-4 py-2.5 text-right font-semibold text-gray-800 font-mono">{prevKmTotal > 0 ? formatMonto(prevKmTotal) : "—"}</td>
             </tr>
-            <tr>
-              <td className="px-4 py-1.5 border-r border-gray-400"></td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center font-semibold">Redondeo</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center">0</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 flex justify-between"><span>$</span> <span>0,00</span></td>
-              <td className="px-4 py-1.5 text-center text-black font-bold"><div className="flex justify-between"><span>$</span> <span>-</span></div></td>
+            <tr className="text-gray-400 opacity-60 bg-gray-50/30 hover:bg-slate-50/50">
+              <td className="px-4 py-2.5 text-center border-r border-gray-100 bg-slate-50/30"></td>
+              <td className="px-4 py-2.5 pl-8 italic">Redondeo</td>
+              <td className="px-4 py-2.5 text-center">0</td>
+              <td className="px-4 py-2.5 text-right font-mono">$ 0,00</td>
+              <td className="px-4 py-2.5 text-right font-mono">—</td>
             </tr>
-            <tr>
-              <td className="px-4 py-1.5 border-r border-gray-400"></td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center font-semibold">Adicional Saputo -llolay</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 text-center">0</td>
-              <td className="px-4 py-1.5 border-r border-gray-400 flex justify-between"><span>$</span> <span>0,00</span></td>
-              <td className="px-4 py-1.5 text-center text-black font-bold"><div className="flex justify-between"><span>$</span> <span>-</span></div></td>
+            <tr className="text-gray-400 opacity-60 bg-gray-50/30 hover:bg-slate-50/50">
+              <td className="px-4 py-2.5 text-center border-r border-gray-100 bg-slate-50/30"></td>
+              <td className="px-4 py-2.5 pl-8 italic">Adicional Saputo -llolay</td>
+              <td className="px-4 py-2.5 text-center">0</td>
+              <td className="px-4 py-2.5 text-right font-mono">$ 0,00</td>
+              <td className="px-4 py-2.5 text-right font-mono">—</td>
             </tr>
           </tbody>
-          <tfoot className="bg-[#ffff99] font-bold border-t-2 border-black text-black">
+          <tfoot className="bg-slate-50 border-t border-gray-300 text-gray-900 font-bold">
             <tr>
-              <td colSpan={4} className="px-4 py-2 border-r border-gray-400 uppercase text-right">Total</td>
-              <td className="px-4 py-2 font-bold text-red-600"><div className="flex justify-between"><span>$</span> <span>{formatMonto(totalGeneral).replace('$', '')}</span></div></td>
+              <td colSpan={4} className="px-4 py-3 uppercase text-right text-xs tracking-wider text-gray-500 font-bold">Total General</td>
+              <td className="px-4 py-3 text-right text-base text-red-600 font-mono">{formatMonto(totalGeneral)}</td>
             </tr>
           </tfoot>
         </table>
