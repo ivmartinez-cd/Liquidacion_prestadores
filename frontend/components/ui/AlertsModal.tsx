@@ -32,6 +32,7 @@ export interface Incidente {
   costo_total_cobrado: number;
   estado_validacion: string;
   alertas: Alerta[];
+  localidad_cliente?: string | null;
 }
 
 interface AlertsModalProps {

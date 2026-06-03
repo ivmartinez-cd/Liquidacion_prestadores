@@ -4,8 +4,25 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { clsEstadoLiquidacion, formatMonto } from "@/lib/utils";
-import { AlertsModal } from "@/components/ui/AlertsModal";
-import type { Alerta, Incidente } from "@/components/ui/AlertsModal";
+
+interface Incidente {
+  id: number;
+  numero_incidente: string;
+  tipo: string;
+  empresa_nombre: string;
+  sucursal_nombre: string;
+  fecha_cierre?: string | null;
+  costo_servicio_cobrado: number;
+  cant_km_cobrado: number;
+  costo_km_cobrado: number;
+  costo_total_cobrado: number;
+  costo_servicio_esperado: number | null;
+  cant_km_esperado: number | null;
+  costo_km_esperado: number | null;
+  estado_validacion: string;
+  localidad_cliente?: string | null;
+  spst_id?: number | null;
+}
 
 interface Liquidacion {
   id: number;
@@ -16,7 +33,6 @@ interface Liquidacion {
   nombre_archivo: string;
   estado: string;
   total_incidentes: number;
-  total_alertas: number;
   total_importe: number;
   incidentes: Incidente[];
 }
@@ -26,8 +42,6 @@ export default function LiquidacionDetailPage() {
   const [liq, setLiq] = useState<Liquidacion | null>(null);
   const [loading, setLoading] = useState(true);
   const [reanalizing, setReanalizing] = useState(false);
-  const [selectedIncidenteId, setSelectedIncidenteId] = useState<number | null>(null);
-  const selectedIncidente = selectedIncidenteId ? liq?.incidentes.find((i) => i.id === selectedIncidenteId) || null : null;
 
   const load = () => {
     setLoading(true);
@@ -45,9 +59,6 @@ export default function LiquidacionDetailPage() {
 
   if (loading) return <div className="p-6 text-sm text-gray-500">Cargando...</div>;
   if (!liq) return <div className="p-6 text-sm text-red-500">Liquidación no encontrada.</div>;
-
-  const conAlertas = liq.incidentes.filter((i) => i.estado_validacion === "con_alertas");
-  const ok = liq.incidentes.filter((i) => i.estado_validacion === "ok");
 
   return (
     <div className="p-6 space-y-5">
@@ -72,30 +83,14 @@ export default function LiquidacionDetailPage() {
           >
             {reanalizing ? "Analizando..." : "Re-analizar"}
           </button>
-          {liq.total_alertas > 0 && (
-            <Link
-              href={`/alertas?liquidacion_id=${liq.id}`}
-              className="text-sm bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700"
-            >
-              Ver {liq.total_alertas} alertas
-            </Link>
-          )}
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
           <p className="text-2xl font-bold text-gray-800">{liq.total_incidentes}</p>
           <p className="text-xs text-gray-500">Incidentes</p>
-        </div>
-        <div className={`border rounded-lg p-3 text-center ${liq.total_alertas > 0 ? "bg-red-50 border-red-200" : "bg-green-50 border-green-200"}`}>
-          <p className={`text-2xl font-bold ${liq.total_alertas > 0 ? "text-red-700" : "text-green-700"}`}>{liq.total_alertas}</p>
-          <p className="text-xs text-gray-500">Alertas</p>
-        </div>
-        <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-          <p className="text-2xl font-bold text-green-700">{ok.length}</p>
-          <p className="text-xs text-gray-500">Sin observaciones</p>
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
           <p className="text-lg font-bold text-gray-800">{formatMonto(liq.total_importe)}</p>
@@ -104,51 +99,77 @@ export default function LiquidacionDetailPage() {
       </div>
 
       {/* Tablas de incidentes separadas */}
-      <IncidentTable 
-        titulo="Correctivos, Pre-correctivos e Instalaciones" 
-        incidentes={liq.incidentes.filter(i => i.tipo.toLowerCase() !== "preventivo")} 
-        liqId={liq.id} 
-        onShowAlerts={(inc) => setSelectedIncidenteId(inc.id)}
+      <IncidentTable
+        titulo="Correctivos, Pre-correctivos e Instalaciones"
+        incidentes={liq.incidentes.filter(i => i.tipo.toLowerCase() !== "preventivo")}
+        liqId={liq.id}
       />
-      
-      <IncidentTable 
-        titulo="Preventivos" 
-        incidentes={liq.incidentes.filter(i => i.tipo.toLowerCase() === "preventivo")} 
-        liqId={liq.id} 
-        onShowAlerts={(inc) => setSelectedIncidenteId(inc.id)}
+
+      <IncidentTable
+        titulo="Preventivos"
+        incidentes={liq.incidentes.filter(i => i.tipo.toLowerCase() === "preventivo")}
+        liqId={liq.id}
       />
 
       {/* Modelo de Facturación */}
       <ModeloFacturacion incidentes={liq.incidentes} />
-
-      {/* Alertas Modal */}
-      {selectedIncidente && (
-        <AlertsModal 
-          incidente={selectedIncidente} 
-          onClose={() => setSelectedIncidenteId(null)} 
-          onRefresh={load} 
-        />
-      )}
     </div>
   );
 }
 
-const IncidentTable = ({ titulo, incidentes, liqId, onShowAlerts }: { titulo: string, incidentes: Incidente[], liqId: number, onShowAlerts: (inc: Incidente) => void }) => {
-  const conAlertas = incidentes.filter((i) => i.estado_validacion === "con_alertas");
-  
+const IncidentTable = ({
+  titulo,
+  incidentes,
+  liqId,
+}: {
+  titulo: string;
+  incidentes: Incidente[];
+  liqId: number;
+}) => {
+  const [selectedDate, setSelectedDate] = useState<string>("");
+
   if (incidentes.length === 0) return null;
 
-  const totalCostoServ = incidentes.reduce((acc, inc) => acc + (inc.costo_servicio_cobrado || 0), 0);
-  const totalKms = incidentes.reduce((acc, inc) => acc + (inc.cant_km_cobrado || 0), 0);
-  const totalGeneral = incidentes.reduce((acc, inc) => acc + (inc.costo_total_cobrado || 0), 0);
+  // Extract unique sorted dates for the filter dropdown
+  const dates = Array.from(
+    new Set(incidentes.map((i) => i.fecha_cierre).filter(Boolean))
+  ).sort() as string[];
+
+  // Filter incidentes by selected closure date
+  const filteredIncidentes = selectedDate
+    ? incidentes.filter((i) => i.fecha_cierre === selectedDate)
+    : incidentes;
+
+  const sortedIncidentes = [...filteredIncidentes].sort((a, b) => {
+    const dateA = a.fecha_cierre || "";
+    const dateB = b.fecha_cierre || "";
+    if (dateA !== dateB) return dateA.localeCompare(dateB);
+    return (a.empresa_nombre || "").localeCompare(b.empresa_nombre || "");
+  });
+
+  const totalCostoServ = filteredIncidentes.reduce((acc, inc) => acc + (inc.costo_servicio_cobrado || 0), 0);
+  const totalKms = filteredIncidentes.reduce((acc, inc) => acc + (inc.cant_km_cobrado || 0), 0);
+  const totalGeneral = filteredIncidentes.reduce((acc, inc) => acc + (inc.costo_total_cobrado || 0), 0);
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden mb-6">
-      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-        <h3 className="font-semibold text-sm text-gray-700">{titulo} ({incidentes.length})</h3>
-        {conAlertas.length > 0 && (
-          <span className="text-xs text-red-600">{conAlertas.length} con alertas</span>
-        )}
+      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between flex-wrap gap-2">
+        <h3 className="font-semibold text-sm text-gray-700">{titulo} ({filteredIncidentes.length})</h3>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500">Filtrar por fecha de cierre:</span>
+          <select
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="text-xs border border-gray-300 rounded px-2 py-1 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="">Todas las fechas</option>
+            {dates.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
       <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
         <table className="w-full text-sm">
@@ -162,65 +183,104 @@ const IncidentTable = ({ titulo, incidentes, liqId, onShowAlerts }: { titulo: st
               <th className="px-4 py-2 text-right">Costo Serv.</th>
               <th className="px-4 py-2 text-right">KMs</th>
               <th className="px-4 py-2 text-right">Total</th>
-              <th className="px-4 py-2 text-center">Estado</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {incidentes.map((inc) => {
-              const tieneAlerta = inc.estado_validacion === "con_alertas";
-              const costoDistinto = inc.costo_servicio_esperado !== null &&
-                Math.abs((inc.costo_servicio_cobrado || 0) - inc.costo_servicio_esperado) > 0.01;
-              const kmDistinto = inc.cant_km_esperado !== null &&
-                Math.abs((inc.cant_km_cobrado || 0) - inc.cant_km_esperado) > 0.01;
+            {(() => {
+              const rows: React.ReactNode[] = [];
+              let lastDate: string | null | undefined = null;
 
-              return (
-                <tr key={inc.id} className="hover:bg-gray-50 text-gray-700">
-                  <td className="px-4 py-2 font-mono text-xs">
-                    <a 
-                      href={`https://webagentes.canaldirecto.com.ar/incidents/view/${inc.numero_incidente}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      {inc.numero_incidente}
-                    </a>
-                  </td>
-                  <td className="px-4 py-2 capitalize text-xs">{inc.tipo.replace(/_/g, " ")}</td>
-                  <td className="px-4 py-2 text-xs">{inc.empresa_nombre || "—"}</td>
-                  <td className="px-4 py-2 text-xs">{inc.sucursal_nombre || "—"}</td>
-                  <td className="px-4 py-2 text-xs">{inc.fecha_cierre || "—"}</td>
-                  <td className={`px-4 py-2 text-right text-xs ${costoDistinto ? "text-red-600 font-semibold" : "text-gray-700"}`}>
-                    {formatMonto(inc.costo_servicio_cobrado)}
-                    {costoDistinto && inc.costo_servicio_esperado !== null && (
-                      <span className="block text-gray-400 font-normal">esp: {formatMonto(inc.costo_servicio_esperado)}</span>
-                    )}
-                  </td>
-                  <td className={`px-4 py-2 text-right text-xs ${kmDistinto ? "text-red-600 font-semibold" : "text-gray-700"}`}>
-                    {inc.cant_km_cobrado > 0 ? `${inc.cant_km_cobrado} km` : "—"}
-                    {kmDistinto && inc.cant_km_esperado !== null && (
-                      <span className="block text-gray-400 font-normal">esp: {inc.cant_km_esperado} km</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-2 text-right text-xs font-medium text-gray-800">
-                    {formatMonto(inc.costo_total_cobrado)}
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    {inc.estado_validacion === "pendiente" ? (
-                      <span className="text-xs text-gray-400">—</span>
-                    ) : tieneAlerta ? (
-                      <button
-                        onClick={() => onShowAlerts(inc)}
-                        className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full hover:bg-red-200"
+              // Pre-compute locality / SPST groups per day to highlight shared-route incidents
+              const sharedGroupCount: Record<string, number> = {};
+              sortedIncidentes.forEach((inc) => {
+                if (inc.fecha_cierre) {
+                  if (inc.spst_id) {
+                    const key = `${inc.fecha_cierre}|spst-${inc.spst_id}`;
+                    sharedGroupCount[key] = (sharedGroupCount[key] || 0) + 1;
+                  } else if (inc.localidad_cliente) {
+                    const key = `${inc.fecha_cierre}|loc-${inc.localidad_cliente}`;
+                    sharedGroupCount[key] = (sharedGroupCount[key] || 0) + 1;
+                  }
+                }
+              });
+
+              sortedIncidentes.forEach((inc, idx) => {
+                const costoDistinto = inc.costo_servicio_esperado !== null &&
+                  Math.abs((inc.costo_servicio_cobrado || 0) - inc.costo_servicio_esperado) > 0.01;
+                const kmDistinto = inc.cant_km_esperado !== null &&
+                  Math.abs((inc.cant_km_cobrado || 0) - inc.cant_km_esperado) > 0.01;
+                
+                let isSharedRoute = false;
+                if (inc.fecha_cierre) {
+                  if (inc.spst_id) {
+                    const key = `${inc.fecha_cierre}|spst-${inc.spst_id}`;
+                    isSharedRoute = (sharedGroupCount[key] || 0) >= 2;
+                  } else if (inc.localidad_cliente) {
+                    const key = `${inc.fecha_cierre}|loc-${inc.localidad_cliente}`;
+                    isSharedRoute = (sharedGroupCount[key] || 0) >= 2;
+                  }
+                }
+                
+                // Highlight only the incident with viatico (KMs > 0) in shared routes
+                const shouldHighlight = isSharedRoute && inc.cant_km_cobrado > 0;
+
+                if (inc.fecha_cierre !== lastDate) {
+                  lastDate = inc.fecha_cierre;
+                  rows.push(
+                    <tr key={`date-${inc.fecha_cierre}-${idx}`} className="bg-blue-50 border-t border-blue-200">
+                      <td colSpan={8} className="px-4 py-1.5">
+                        <span className="text-xs font-semibold text-blue-700 tracking-wide">
+                          📅 {inc.fecha_cierre || "Sin fecha"}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                }
+
+                rows.push(
+                  <tr
+                    key={inc.id}
+                    className={`hover:bg-gray-50 text-gray-700 transition-colors ${
+                      shouldHighlight ? "bg-amber-50 hover:bg-amber-100 font-medium text-amber-900" : ""
+                    }`}
+                  >
+                    <td className="px-4 py-2 font-mono text-xs">
+                      <a
+                        href={`https://webagentes.canaldirecto.com.ar/incidents/view/${inc.numero_incidente}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
                       >
-                        Alertas ({inc.alertas?.length || 0})
-                      </button>
-                    ) : (
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">OK</span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
+                        {inc.numero_incidente}
+                      </a>
+                    </td>
+                    <td className="px-4 py-2 capitalize text-xs">{inc.tipo.replace(/_/g, " ")}</td>
+                    <td className="px-4 py-2 text-xs">{inc.empresa_nombre || "—"}</td>
+                    <td className="px-4 py-2 text-xs">
+                      {inc.sucursal_nombre || "—"}
+                    </td>
+                    <td className="px-4 py-2 text-xs">{inc.fecha_cierre || "—"}</td>
+                    <td className={`px-4 py-2 text-right text-xs ${costoDistinto ? "text-red-600 font-semibold" : "text-gray-700"}`}>
+                      {formatMonto(inc.costo_servicio_cobrado)}
+                      {costoDistinto && inc.costo_servicio_esperado !== null && (
+                        <span className="block text-gray-400 font-normal">esp: {formatMonto(inc.costo_servicio_esperado)}</span>
+                      )}
+                    </td>
+                    <td className={`px-4 py-2 text-right text-xs ${kmDistinto ? "text-red-600 font-semibold" : "text-gray-700"}`}>
+                      {inc.cant_km_cobrado > 0 ? `${inc.cant_km_cobrado} km` : "—"}
+                      {kmDistinto && inc.cant_km_esperado !== null && (
+                        <span className="block text-gray-400 font-normal">esp: {inc.cant_km_esperado} km</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2 text-right text-xs font-medium text-gray-800">
+                      {formatMonto(inc.costo_total_cobrado)}
+                    </td>
+                  </tr>
+                );
+              });
+
+              return rows;
+            })()}
           </tbody>
           <tfoot className="bg-gray-50 border-t border-gray-200">
             <tr>
@@ -230,7 +290,6 @@ const IncidentTable = ({ titulo, incidentes, liqId, onShowAlerts }: { titulo: st
               <td className="px-4 py-3 text-right text-xs font-semibold">{formatMonto(totalCostoServ)}</td>
               <td className="px-4 py-3 text-right text-xs font-semibold">{totalKms > 0 ? `${totalKms} km` : "—"}</td>
               <td className="px-4 py-3 text-right text-xs font-semibold">{formatMonto(totalGeneral)}</td>
-              <td></td>
             </tr>
           </tfoot>
         </table>

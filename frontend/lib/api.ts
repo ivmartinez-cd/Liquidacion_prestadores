@@ -101,6 +101,8 @@ export const api = {
     fetchAPI(`/liquidaciones/${id}/estado?estado=${estado}`, { method: "PUT" }),
   deleteLiquidacion: (id: number) =>
     fetchAPI(`/liquidaciones/${id}`, { method: "DELETE" }),
+  cambiarEstadoObservacion: (liqId: number, obsId: number, estado: string) =>
+    fetchAPI(`/liquidaciones/${liqId}/observaciones/${obsId}/estado?estado=${encodeURIComponent(estado)}`, { method: "PUT" }),
 
   // Alertas
   getAlertas: (params?: Record<string, string>) => {

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime, date
-from typing import Optional, List
+from typing import Optional, List, Any
 from app.schemas.alerta import AlertaResponse
 
 
@@ -20,12 +20,38 @@ class IncidenteResumen(BaseModel):
     costo_total_cobrado: float
     estado_validacion: str
     alertas: List[AlertaResponse] = []
+    localidad_cliente: Optional[str] = None
+    spst_id: Optional[int] = None
+
+
+class ObservacionIncidenteResumen(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    incidente_id: int
+    rol: str
+
+
+class ObservacionResumen(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    tipo_observacion: str
+    severidad: str
+    titulo: str
+    descripcion: Optional[str]
+    datos_contexto: Optional[Any]
+    monto_cobrado: float
+    monto_esperado: float
+    diferencia: float
+    estado: str
+    regla_codigo: Optional[str]
+    fecha_generacion: datetime
+    incidentes: List[ObservacionIncidenteResumen] = []
 
 
 class LiquidacionListResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     prestador_id: int
+    prestador_nombre: Optional[str] = None
     numero_liquidacion: Optional[str]
     periodo: str
     tipo_liquidacion: str
@@ -39,3 +65,4 @@ class LiquidacionListResponse(BaseModel):
 
 class LiquidacionResponse(LiquidacionListResponse):
     incidentes: List[IncidenteResumen] = []
+    observaciones: List[ObservacionResumen] = []

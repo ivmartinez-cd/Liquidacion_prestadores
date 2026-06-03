@@ -1,6 +1,10 @@
 {
     "python.defaultInterpreterPath": "C:\\Users\\imartinez.CDSA\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
     "python.analysis.extraPaths": [
-        "./backend"
-    ]
+        "./backend",
+        "C:\\Users\\imartinez.CDSA\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages"
+    ],
+    "python.analysis.pythonPath": "C:\\Users\\imartinez.CDSA\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "python.languageServer": "Pylance",
+    "pyrefly.enable": false
 }

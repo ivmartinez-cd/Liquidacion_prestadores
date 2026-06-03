@@ -20,3 +20,8 @@ class Liquidacion(Base):
 
     prestador = relationship("Prestador", back_populates="liquidaciones")
     incidentes = relationship("Incidente", back_populates="liquidacion", cascade="all, delete-orphan")
+    observaciones = relationship("Observacion", back_populates="liquidacion", cascade="all, delete-orphan")
+
+    @property
+    def prestador_nombre(self) -> str:
+        return self.prestador.nombre if self.prestador else ""

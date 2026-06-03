@@ -7,6 +7,7 @@ import { clsEstadoLiquidacion, formatMonto, formatFecha } from "@/lib/utils";
 interface Liquidacion {
   id: number;
   prestador_id: number;
+  prestador_nombre?: string;
   numero_liquidacion: string;
   periodo: string;
   tipo_liquidacion: string;
@@ -55,6 +56,7 @@ export default function LiquidacionesPage() {
           <thead>
             <tr className="bg-gray-50 text-xs text-gray-500 uppercase border-b">
               <th className="px-4 py-3 text-left">Archivo</th>
+              <th className="px-4 py-3 text-left">Prestador</th>
               <th className="px-4 py-3 text-left">Período</th>
               <th className="px-4 py-3 text-left">Tipo</th>
               <th className="px-4 py-3 text-left">Estado</th>
@@ -68,14 +70,14 @@ export default function LiquidacionesPage() {
           <tbody className="divide-y divide-gray-50">
             {loading && (
               <tr>
-                <td colSpan={9} className="px-4 py-8 text-center text-gray-400 text-sm">
+                <td colSpan={10} className="px-4 py-8 text-center text-gray-400 text-sm">
                   Cargando...
                 </td>
               </tr>
             )}
             {!loading && items.length === 0 && (
               <tr>
-                <td colSpan={9} className="px-4 py-8 text-center text-gray-400 text-sm">
+                <td colSpan={10} className="px-4 py-8 text-center text-gray-400 text-sm">
                   No hay liquidaciones importadas aún.{" "}
                   <Link href="/liquidaciones/nueva" className="text-blue-600 hover:underline">
                     Importar primera
@@ -90,6 +92,7 @@ export default function LiquidacionesPage() {
                     {l.nombre_archivo || l.numero_liquidacion || `#${l.id}`}
                   </Link>
                 </td>
+                <td className="px-4 py-3 text-gray-700 font-medium">{l.prestador_nombre || "—"}</td>
                 <td className="px-4 py-3 text-gray-600">{l.periodo}</td>
                 <td className="px-4 py-3">
                   <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded">

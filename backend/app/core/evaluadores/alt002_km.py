@@ -3,6 +3,9 @@ from app.models.incidente import Incidente
 from app.models.tabla_km import TablaKM
 from app.core.evaluadores.base import EvaluadorBase
 
+# Must match UMBRAL_CORREDOR_KM in alt005_ruta.py
+UMBRAL_CORREDOR_KM = 50
+
 
 class EvaluadorALT002(EvaluadorBase):
     def evaluar(self, incidente: Incidente) -> List[Dict[str, Any]]:
@@ -19,29 +22,9 @@ class EvaluadorALT002(EvaluadorBase):
         tolerancia = config.get("tolerancia_km", 0.5)
 
         if abs(cobrado - esperado) > tolerancia:
-            # Check if this is a shared route where KMs were charged in another incident
-            if cobrado == 0 and esperado > 0:
-                current_localidad = tabla.localidad_cliente
-                
-                if current_localidad and current_localidad.strip():
-                    # Check same-day incidents in same locality with KMs cobrados > 0
-                    other_incidents_with_km = (
-                        self.db.query(Incidente)
-                        .join(TablaKM, (TablaKM.prestador_id == self.prestador_id) & 
-                                       (TablaKM.empresa_nombre == Incidente.empresa_nombre) & 
-                                       (TablaKM.sucursal_nombre == Incidente.sucursal_nombre))
-                        .filter(
-                            Incidente.liquidacion_id == incidente.liquidacion_id,
-                            Incidente.id != incidente.id,
-                            Incidente.fecha_cierre == incidente.fecha_cierre,
-                            Incidente.cant_km_cobrado > 0,
-                            TablaKM.localidad_cliente.ilike(current_localidad.strip()),
-                        )
-                        .first()
-                    )
-                    if other_incidents_with_km:
-                        # Correctly shared route, suppress KMs Incorrectos alert
-                        return []
+            # Suppress false positive when km=0 is intentional (shared route)
+            if cobrado == 0 and esperado > 0 and self._es_ruta_compartida(incidente, tabla):
+                return []
 
             return [self._alerta(
                 f"KMs cobrados {cobrado} km difieren de la Tabla KM ({esperado} km) "
@@ -55,6 +38,47 @@ class EvaluadorALT002(EvaluadorBase):
                 },
             )]
         return []
+
+    def _es_ruta_compartida(self, incidente: Incidente, tabla: TablaKM) -> bool:
+        """Return True if another same-day incident covers the km for this one.
+
+        Checks both exact locality match (classic) and corridor match (same SPST,
+        within UMBRAL_CORREDOR_KM), so that cases like Bigand/Bombal on the same
+        route from the same SPST are correctly recognized as grouped.
+        """
+        base_q = (
+            self.db.query(Incidente)
+            .join(
+                TablaKM,
+                (TablaKM.prestador_id == self.prestador_id)
+                & (TablaKM.empresa_nombre == Incidente.empresa_nombre)
+                & (TablaKM.sucursal_nombre == Incidente.sucursal_nombre),
+            )
+            .filter(
+                Incidente.liquidacion_id == incidente.liquidacion_id,
+                Incidente.id != incidente.id,
+                Incidente.fecha_cierre == incidente.fecha_cierre,
+                Incidente.cant_km_cobrado > 0,
+            )
+        )
+
+        # Exact locality match (original logic)
+        if tabla.localidad_cliente and tabla.localidad_cliente.strip():
+            if base_q.filter(
+                TablaKM.localidad_cliente.ilike(tabla.localidad_cliente.strip())
+            ).first():
+                return True
+
+        # Corridor match: same SPST + kms_recorrido within ±UMBRAL_CORREDOR_KM
+        if tabla.spst_id:
+            km = tabla.kms_recorrido
+            if base_q.filter(
+                TablaKM.spst_id == tabla.spst_id,
+                TablaKM.kms_recorrido.between(km - UMBRAL_CORREDOR_KM, km + UMBRAL_CORREDOR_KM),
+            ).first():
+                return True
+
+        return False
 
     def _find_tabla(self, incidente: Incidente):
         return (
