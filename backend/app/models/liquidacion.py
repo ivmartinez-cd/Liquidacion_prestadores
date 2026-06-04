@@ -13,7 +13,7 @@ class Liquidacion(Base):
     tipo_liquidacion = Column(String(30), default="regular")  # regular | preco | cc | deposito
     nombre_archivo = Column(String(300))
     fecha_importacion = Column(DateTime, server_default=func.now())
-    estado = Column(String(20), default="pendiente")  # pendiente | en_revision | aprobada | rechazada
+    estado = Column(String(20), default="abierta")  # abierta | preliquidada | recibida | observada | aprobada | cerrada
     total_incidentes = Column(Integer, default=0)
     total_alertas = Column(Integer, default=0)
     total_importe = Column(Float, default=0.0)

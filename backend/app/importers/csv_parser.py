@@ -93,13 +93,32 @@ def _extract_tipo_liquidacion(nombre: str) -> str:
 
 
 def _extract_periodo(nombre: str, incidentes: List[Dict]) -> str:
-    m = re.search(r"_(\d{4})(\d{2})\d{2}", nombre)
-    if m:
-        return f"{m.group(1)}-{m.group(2)}"
+    # 1. Intentar obtener el período más frecuente a partir de las fechas de cierre de los incidentes (es lo más preciso)
+    periodos = []
     for inc in incidentes:
         f = inc.get("fecha_cierre")
         if f:
-            return f"{f.year}-{f.month:02d}"
+            periodos.append(f"{f.year}-{f.month:02d}")
+    
+    if periodos:
+        # Retornar el período más frecuente
+        return max(set(periodos), key=periodos.count)
+        
+    # 2. Si no hay incidentes con fecha de cierre, intentar extraerlo del nombre del archivo
+    m = re.search(r"_(\d{4})(\d{2})\d{2}", nombre)
+    if m:
+        try:
+            anio = int(m.group(1))
+            mes = int(m.group(2))
+            # Fallback: asumir que el archivo se exportó el mes siguiente al período liquidado
+            if mes == 1:
+                mes = 12
+                anio -= 1
+            else:
+                mes -= 1
+            return f"{anio}-{mes:02d}"
+        except ValueError:
+            pass
     return ""
 
 

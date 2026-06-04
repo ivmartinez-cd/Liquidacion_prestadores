@@ -22,6 +22,7 @@ interface Incidente {
   estado_validacion: string;
   localidad_cliente?: string | null;
   spst_id?: number | null;
+  url_maps?: string | null;
 }
 
 interface Liquidacion {
@@ -68,9 +69,29 @@ export default function LiquidacionDetailPage() {
           <Link href="/liquidaciones" className="text-xs text-blue-600 hover:underline mb-1 block">← Volver</Link>
           <h2 className="text-xl font-bold text-gray-800">{liq.nombre_archivo || `Liquidación #${liq.id}`}</h2>
           <div className="flex items-center gap-2 mt-1">
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${clsEstadoLiquidacion(liq.estado)}`}>
-              {liq.estado}
-            </span>
+            <select
+              value={liq.estado}
+              onChange={async (e) => {
+                const newEstado = e.target.value;
+                try {
+                  await api.cambiarEstado(liq.id, newEstado);
+                  setLiq({ ...liq, estado: newEstado });
+                } catch (err) {
+                  alert("Error al actualizar el estado de la liquidación");
+                }
+              }}
+              className={`text-xs px-2 py-0.5 rounded-full font-semibold cursor-pointer border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${clsEstadoLiquidacion(liq.estado)}`}
+            >
+              <option value="abierta" className="bg-white text-gray-800 font-medium">Abierta</option>
+              <option value="preliquidada" className="bg-white text-gray-800 font-medium">Preliquidada</option>
+              <option value="recibida" className="bg-white text-gray-800 font-medium">Recibida</option>
+              <option value="observada" className="bg-white text-gray-800 font-medium">Observada</option>
+              <option value="aprobada" className="bg-white text-gray-800 font-medium">Aprobada</option>
+              <option value="cerrada" className="bg-white text-gray-800 font-medium">Cerrada</option>
+              {liq.estado === "pendiente" && (
+                <option value="pendiente" className="bg-white text-gray-800 font-medium">Pendiente</option>
+              )}
+            </select>
             <span className="text-xs text-gray-500">Período {liq.periodo}</span>
             <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">{liq.tipo_liquidacion}</span>
           </div>
@@ -257,7 +278,19 @@ const IncidentTable = ({
                     <td className="px-4 py-2 capitalize text-xs">{inc.tipo.replace(/_/g, " ")}</td>
                     <td className="px-4 py-2 text-xs">{inc.empresa_nombre || "—"}</td>
                     <td className="px-4 py-2 text-xs">
-                      {inc.sucursal_nombre || "—"}
+                      {inc.url_maps ? (
+                        <a
+                          href={inc.url_maps}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline underline-offset-2 transition-colors group"
+                        >
+                          {inc.sucursal_nombre || "—"}
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 opacity-50 group-hover:opacity-100 flex-shrink-0"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        </a>
+                      ) : (
+                        <span>{inc.sucursal_nombre || "—"}</span>
+                      )}
                     </td>
                     <td className="px-4 py-2 text-xs">{inc.fecha_cierre || "—"}</td>
                     <td className={`px-4 py-2 text-right text-xs ${costoDistinto ? "text-red-600 font-semibold" : "text-gray-700"}`}>

@@ -13,7 +13,7 @@ router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 @router.get("/stats")
 def get_stats(db: Session = Depends(get_db)):
     total_liq = db.query(func.count(Liquidacion.id)).scalar() or 0
-    liq_pendientes = db.query(func.count(Liquidacion.id)).filter(Liquidacion.estado == "pendiente").scalar() or 0
+    liq_pendientes = db.query(func.count(Liquidacion.id)).filter(Liquidacion.estado.in_(["abierta", "preliquidada", "recibida", "observada"])).scalar() or 0
     total_incidentes = db.query(func.sum(Liquidacion.total_incidentes)).scalar() or 0
     total_importe = db.query(func.sum(Liquidacion.total_importe)).scalar() or 0
 

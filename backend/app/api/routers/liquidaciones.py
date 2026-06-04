@@ -80,8 +80,8 @@ def get_liquidacion(id: int, db: Session = Depends(get_db)):
     if not liq:
         raise HTTPException(status_code=404, detail="Liquidación no encontrada")
 
-    # Build a sucursal -> (localidad, spst_id) map from TablaKM to enrich incidents
-    km_rows = db.query(TablaKM.sucursal_nombre, TablaKM.localidad_cliente, TablaKM.spst_id).filter(
+    # Build a sucursal -> (localidad, spst_id, url_maps) map from TablaKM to enrich incidents
+    km_rows = db.query(TablaKM.sucursal_nombre, TablaKM.localidad_cliente, TablaKM.spst_id, TablaKM.url_maps).filter(
         TablaKM.sucursal_nombre.isnot(None),
     ).distinct().all()
     sucursal_to_info = {}
@@ -90,6 +90,7 @@ def get_liquidacion(id: int, db: Session = Depends(get_db)):
             sucursal_to_info[row.sucursal_nombre.strip().lower()] = {
                 "localidad": row.localidad_cliente,
                 "spst_id": row.spst_id,
+                "url_maps": row.url_maps,
             }
 
     # Build enriched response manually
@@ -101,6 +102,7 @@ def get_liquidacion(id: int, db: Session = Depends(get_db)):
             if info:
                 inc_schema.localidad_cliente = info["localidad"]
                 inc_schema.spst_id = info["spst_id"]
+                inc_schema.url_maps = info["url_maps"]
 
     return response_data
 
@@ -136,7 +138,7 @@ def reanalize(id: int, db: Session = Depends(get_db)):
 
 @router.put("/{id}/estado")
 def cambiar_estado(id: int, estado: str, db: Session = Depends(get_db)):
-    estados_validos = {"pendiente", "en_revision", "aprobada", "rechazada"}
+    estados_validos = {"abierta", "preliquidada", "recibida", "observada", "aprobada", "cerrada"}
     if estado not in estados_validos:
         raise HTTPException(status_code=400, detail=f"Estado inválido. Opciones: {estados_validos}")
     liq = db.query(Liquidacion).filter(Liquidacion.id == id).first()

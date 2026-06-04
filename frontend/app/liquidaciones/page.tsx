@@ -22,6 +22,7 @@ interface Liquidacion {
 export default function LiquidacionesPage() {
   const [items, setItems] = useState<Liquidacion[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState("todos");
 
   const load = () => {
     setLoading(true);
@@ -36,6 +37,12 @@ export default function LiquidacionesPage() {
     load();
   };
 
+  const filteredItems = items.filter((item) => {
+    if (statusFilter === "todos") return true;
+    if (statusFilter === "abiertas") return item.estado === "abierta" || item.estado === "pendiente";
+    return item.estado === statusFilter;
+  });
+
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -49,6 +56,27 @@ export default function LiquidacionesPage() {
         >
           + Importar
         </Link>
+      </div>
+
+      {/* Filtros */}
+      <div className="bg-white p-4 border border-gray-200 rounded-lg flex items-center gap-3 shadow-sm">
+        <div className="flex items-center gap-2">
+          <label htmlFor="filter-estado" className="text-sm font-semibold text-gray-700">Estado</label>
+          <select
+            id="filter-estado"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+          >
+            <option value="todos">-- Todos --</option>
+            <option value="abiertas">ABIERTAS</option>
+            <option value="preliquidada">Preliquidada</option>
+            <option value="recibida">Recibida</option>
+            <option value="observada">Observada</option>
+            <option value="aprobada">Aprobada</option>
+            <option value="cerrada">Cerrada</option>
+          </select>
+        </div>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
@@ -84,7 +112,14 @@ export default function LiquidacionesPage() {
                 </td>
               </tr>
             )}
-            {items.map((l) => (
+            {!loading && items.length > 0 && filteredItems.length === 0 && (
+              <tr>
+                <td colSpan={10} className="px-4 py-8 text-center text-gray-400 text-sm">
+                  No hay liquidaciones con el estado seleccionado.
+                </td>
+              </tr>
+            )}
+            {filteredItems.map((l) => (
               <tr key={l.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3">
                   <Link href={`/liquidaciones/${l.id}`} className="text-blue-600 hover:underline font-medium">

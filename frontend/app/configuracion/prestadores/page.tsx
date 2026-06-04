@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
-import { exportToCSV, parseCSV } from "@/lib/utils";
+import { exportToCSV, parseCSV, downloadCSVTemplate } from "@/lib/utils";
 
 interface Prestador {
   id: number;
@@ -60,7 +60,23 @@ export default function PrestadoresPage() {
   };
 
   const downloadTemplate = () => {
-    exportToCSV([Object.fromEntries(TEMPLATE_COLS.map((c) => [c, ""]))], "plantilla_prestadores.csv");
+    const content = `sep=,
+# ==============================================================================
+# PLANTILLA DE IMPORTACION DE PRESTADORES
+# ==============================================================================
+# Instrucciones de llenado:
+# - nombre: Razon social o nombre completo del prestador (ej. Supernova Servicios S.R.L.).
+# - nombre_corto: Identificador clave (letras mayusculas sin espacios, ej. SUPERNOVA).
+# - cuit: CUIT de la empresa sin guiones ni espacios (ej. 30712345678).
+# - region: Provincia o zona de operacion principal (ej. Santa Fe, Cordoba, Buenos Aires).
+#
+# Nota: Puede borrar estas lineas de ayuda o dejarlas. El sistema las omitira al importar.
+# ==============================================================================
+nombre,nombre_corto,cuit,region
+Supernova Servicios S.R.L.,SUPERNOVA,30711122238,Rosario
+Pentacom S.A.,PENTACOM,30655544439,Cordoba
+`;
+    downloadCSVTemplate(content, "plantilla_prestadores.csv");
   };
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -113,22 +129,14 @@ export default function PrestadoresPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-800">Prestadores</h2>
         <div className="flex items-center gap-2">
-          <label className="text-xs bg-green-600 text-white px-3 py-1.5 rounded hover:bg-green-700 cursor-pointer font-medium">
-            Importar Excel (.xlsx)
-            <input ref={xlsxRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={handleImportXlsx} />
-          </label>
           <button onClick={downloadTemplate}
-            className="text-xs border border-gray-300 text-gray-600 px-3 py-1.5 rounded hover:bg-gray-50">
-            Plantilla CSV
+            className="text-xs border border-gray-300 text-gray-600 px-3 py-1.5 rounded hover:bg-gray-50 font-medium transition-colors">
+            Descargar planilla CSV
           </button>
-          <label className="text-xs border border-blue-300 text-blue-700 px-3 py-1.5 rounded hover:bg-blue-50 cursor-pointer">
-            Importar CSV
+          <label className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 cursor-pointer font-medium transition-colors">
+            Cargar Planilla CSV
             <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={handleImport} />
           </label>
-          <button onClick={handleExport}
-            className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded hover:bg-gray-200">
-            Exportar CSV
-          </button>
         </div>
       </div>
 

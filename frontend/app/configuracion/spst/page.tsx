@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
-import { exportToCSV, parseCSV } from "@/lib/utils";
+import { exportToCSV, parseCSV, downloadCSVTemplate } from "@/lib/utils";
 
 interface Prestador { id: number; nombre_corto: string; }
 interface SPST {
@@ -77,10 +77,25 @@ export default function SPSTPage() {
   };
 
   const downloadTemplate = () => {
-    exportToCSV(
-      [{ prestador_clave: "", nombre: "", localidad: "", provincia: "", zona: "", domicilio: "" }],
-      "plantilla_spsts.csv"
-    );
+    const content = `sep=,
+# ==============================================================================
+# PLANTILLA DE IMPORTACION DE SUB-PRESTADORES (SPST)
+# ==============================================================================
+# Instrucciones de llenado:
+# - prestador_clave: Clave corta del prestador padre (debe existir previamente, ej. PENTACOM).
+# - nombre: Nombre descriptivo del sub-prestador (ej. PST Mar del Plata - Jose Perez).
+# - localidad: Localidad base (ej. Mar del Plata).
+# - provincia: Provincia base (ej. Buenos Aires).
+# - zona: Zonas de cobertura separadas por coma (ej. Mar del Plata, Miramar, Necochea).
+# - domicilio: Domicilio operativo o fiscal (ej. Av. Colon 1234).
+#
+# Nota: Puede borrar estas lineas de ayuda o dejarlas. El sistema las omitira al importar.
+# ==============================================================================
+prestador_clave,nombre,localidad,provincia,zona,domicilio
+SUPERNOVA,PST Rosario Centro,Rosario,Santa Fe,Rosario,Pellegrini 1500
+PENTACOM,PST Cordoba Capital,Cordoba,Cordoba,Cordoba,Colon 200
+`;
+    downloadCSVTemplate(content, "plantilla_spsts.csv");
   };
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,17 +139,13 @@ export default function SPSTPage() {
         </div>
         <div className="flex items-center gap-2">
           <button onClick={downloadTemplate}
-            className="text-xs border border-gray-300 text-gray-600 px-3 py-1.5 rounded hover:bg-gray-50">
-            Plantilla CSV
+            className="text-xs border border-gray-300 text-gray-600 px-3 py-1.5 rounded hover:bg-gray-50 font-medium transition-colors">
+            Descargar planilla CSV
           </button>
-          <label className="text-xs border border-blue-300 text-blue-700 px-3 py-1.5 rounded hover:bg-blue-50 cursor-pointer">
-            Importar CSV
+          <label className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 cursor-pointer font-medium transition-colors">
+            Cargar Planilla CSV
             <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={handleImport} />
           </label>
-          <button onClick={handleExport}
-            className="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded hover:bg-gray-200">
-            Exportar CSV
-          </button>
         </div>
       </div>
 

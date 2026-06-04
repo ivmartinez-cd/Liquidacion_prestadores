@@ -22,6 +22,8 @@ class IncidenteResumen(BaseModel):
     alertas: List[AlertaResponse] = []
     localidad_cliente: Optional[str] = None
     spst_id: Optional[int] = None
+    url_maps: Optional[str] = None
+
 
 
 class ObservacionIncidenteResumen(BaseModel):

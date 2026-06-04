@@ -353,6 +353,19 @@ def create_prestador(data: PrestadorCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Ya existe un prestador con ese nombre corto")
     p = Prestador(**data.model_dump())
     db.add(p)
+    db.flush()
+    
+    # Crear SPST por defecto para evitar doble carga manual
+    default_spst = SPST(
+        prestador_id=p.id,
+        nombre=f"PST {p.nombre}",
+        localidad=p.region or "",
+        provincia="",
+        zona=p.region or "",
+        activo=True
+    )
+    db.add(default_spst)
+    
     db.commit()
     db.refresh(p)
     return p
