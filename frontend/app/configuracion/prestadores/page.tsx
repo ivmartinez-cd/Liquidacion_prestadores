@@ -133,7 +133,7 @@ Pentacom S.A.,PENTACOM,30655544439,Cordoba
             className="text-xs border border-gray-300 text-gray-600 px-3 py-1.5 rounded hover:bg-gray-50 font-medium transition-colors">
             Descargar planilla CSV
           </button>
-          <label className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 cursor-pointer font-medium transition-colors">
+          <label className="text-xs bg-brand-600 text-white px-3 py-1.5 rounded hover:bg-brand-700 cursor-pointer font-medium transition-colors">
             Cargar Planilla CSV
             <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={handleImport} />
           </label>
@@ -146,7 +146,7 @@ Pentacom S.A.,PENTACOM,30655544439,Cordoba
         </div>
       )}
       {importStatus && (
-        <div className="text-sm px-3 py-2 bg-blue-50 border border-blue-200 rounded text-blue-800">
+        <div className="text-sm px-3 py-2 bg-brand-50 border border-brand-200 rounded text-brand-800">
           {importStatus}
         </div>
       )}
@@ -159,24 +159,24 @@ Pentacom S.A.,PENTACOM,30655544439,Cordoba
           <div>
             <label className="block text-xs text-gray-500 mb-1">Nombre completo *</label>
             <input value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-              className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+              className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500" />
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">Nombre corto (clave) *</label>
             <input value={form.nombre_corto} onChange={(e) => setForm({ ...form, nombre_corto: e.target.value.toUpperCase() })}
               placeholder="PENTACOM"
-              className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-blue-500" />
+              className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-brand-500" />
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">CUIT</label>
             <input value={form.cuit} onChange={(e) => setForm({ ...form, cuit: e.target.value })}
-              className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+              className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500" />
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">Región / Plaza</label>
             <input value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value })}
               placeholder="Córdoba, Rosario..."
-              className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+              className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500" />
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -184,7 +184,7 @@ Pentacom S.A.,PENTACOM,30655544439,Cordoba
           <label htmlFor="activo" className="text-sm text-gray-600">Activo</label>
         </div>
         <div className="flex gap-2">
-          <button onClick={handleSave} className="bg-blue-600 text-white text-sm px-4 py-1.5 rounded hover:bg-blue-700">
+          <button onClick={handleSave} className="bg-brand-600 text-white text-sm px-4 py-1.5 rounded hover:bg-brand-700">
             {editId ? "Guardar cambios" : "Crear prestador"}
           </button>
           {editId && (
@@ -221,7 +221,7 @@ Pentacom S.A.,PENTACOM,30655544439,Cordoba
                   </span>
                 </td>
                 <td className="px-4 py-2.5 text-right space-x-3">
-                  <button onClick={() => handleEdit(p)} className="text-xs text-blue-600 hover:underline">Editar</button>
+                  <button onClick={() => handleEdit(p)} className="text-xs text-brand-600 hover:underline">Editar</button>
                   <button onClick={() => handleDelete(p.id)} className="text-xs text-red-400 hover:text-red-600">Eliminar</button>
                 </td>
               </tr>

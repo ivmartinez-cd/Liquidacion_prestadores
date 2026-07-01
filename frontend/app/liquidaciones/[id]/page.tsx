@@ -66,7 +66,7 @@ export default function LiquidacionDetailPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <Link href="/liquidaciones" className="text-xs text-blue-600 hover:underline mb-1 block">← Volver</Link>
+          <Link href="/liquidaciones" className="text-xs text-brand-600 hover:underline mb-1 block">← Volver</Link>
           <h2 className="text-xl font-bold text-gray-800">{liq.nombre_archivo || `Liquidación #${liq.id}`}</h2>
           <div className="flex items-center gap-2 mt-1">
             <select
@@ -80,7 +80,7 @@ export default function LiquidacionDetailPage() {
                   alert("Error al actualizar el estado de la liquidación");
                 }
               }}
-              className={`text-xs px-2 py-0.5 rounded-full font-semibold cursor-pointer border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${clsEstadoLiquidacion(liq.estado)}`}
+              className={`text-xs px-2 py-0.5 rounded-full font-semibold cursor-pointer border-0 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors ${clsEstadoLiquidacion(liq.estado)}`}
             >
               <option value="abierta" className="bg-white text-gray-800 font-medium">Abierta</option>
               <option value="preliquidada" className="bg-white text-gray-800 font-medium">Preliquidada</option>
@@ -181,7 +181,7 @@ const IncidentTable = ({
           <select
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="text-xs border border-gray-300 rounded px-2 py-1 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="text-xs border border-gray-300 rounded px-2 py-1 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-brand-500"
           >
             <option value="">Todas las fechas</option>
             {dates.map((d) => (
@@ -248,9 +248,9 @@ const IncidentTable = ({
                 if (inc.fecha_cierre !== lastDate) {
                   lastDate = inc.fecha_cierre;
                   rows.push(
-                    <tr key={`date-${inc.fecha_cierre}-${idx}`} className="bg-blue-50 border-t border-blue-200">
+                    <tr key={`date-${inc.fecha_cierre}-${idx}`} className="bg-brand-50 border-t border-brand-200">
                       <td colSpan={8} className="px-4 py-1.5">
-                        <span className="text-xs font-semibold text-blue-700 tracking-wide">
+                        <span className="text-xs font-semibold text-brand-700 tracking-wide">
                           📅 {inc.fecha_cierre || "Sin fecha"}
                         </span>
                       </td>
@@ -270,7 +270,7 @@ const IncidentTable = ({
                         href={`https://webagentes.canaldirecto.com.ar/incidents/view/${inc.numero_incidente}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
+                        className="text-brand-600 hover:underline"
                       >
                         {inc.numero_incidente}
                       </a>
@@ -283,7 +283,7 @@ const IncidentTable = ({
                           href={inc.url_maps}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline underline-offset-2 transition-colors group"
+                          className="inline-flex items-center gap-1 text-brand-600 hover:text-brand-800 hover:underline underline-offset-2 transition-colors group"
                         >
                           {inc.sucursal_nombre || "—"}
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 opacity-50 group-hover:opacity-100 flex-shrink-0"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>

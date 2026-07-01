@@ -1,6 +1,6 @@
 export function clsEstadoLiquidacion(estado: string): string {
   const map: Record<string, string> = {
-    abierta: "bg-blue-100 text-blue-800",
+    abierta: "bg-sky-100 text-sky-800",
     preliquidada: "bg-purple-100 text-purple-800",
     recibida: "bg-indigo-100 text-indigo-800",
     observada: "bg-amber-100 text-amber-800",

@@ -64,7 +64,7 @@ export default function Dashboard() {
         </div>
         <Link
           href="/liquidaciones/nueva"
-          className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className="bg-brand-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors"
         >
           + Importar liquidación
         </Link>
@@ -81,7 +81,7 @@ export default function Dashboard() {
         <StatCard
           label="Total importadas"
           value={stats.total_liquidaciones}
-          color="bg-blue-50 border-blue-200 text-blue-900"
+          color="bg-brand-50 border-brand-200 text-brand-900"
         />
         <StatCard
           label="Total incidentes"
@@ -99,7 +99,7 @@ export default function Dashboard() {
       <div className="bg-white border border-gray-200 rounded-lg">
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
           <h3 className="font-semibold text-sm text-gray-700">Últimas liquidaciones</h3>
-          <Link href="/liquidaciones" className="text-xs text-blue-600 hover:underline">Ver todas</Link>
+          <Link href="/liquidaciones" className="text-xs text-brand-600 hover:underline">Ver todas</Link>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -118,14 +118,14 @@ export default function Dashboard() {
                 <tr>
                   <td colSpan={6} className="px-4 py-6 text-center text-gray-400 text-xs">
                     Aún no hay liquidaciones importadas.{" "}
-                    <Link href="/liquidaciones/nueva" className="text-blue-600 hover:underline">Importar primera liquidación</Link>
+                    <Link href="/liquidaciones/nueva" className="text-brand-600 hover:underline">Importar primera liquidación</Link>
                   </td>
                 </tr>
               )}
               {stats.recientes.map((l) => (
                 <tr key={l.id} className="hover:bg-gray-50 cursor-pointer">
                   <td className="px-4 py-2.5">
-                    <Link href={`/liquidaciones/${l.id}`} className="font-medium text-gray-800 hover:text-blue-600">
+                    <Link href={`/liquidaciones/${l.id}`} className="font-medium text-gray-800 hover:text-brand-600">
                       {l.prestador}
                     </Link>
                     {l.tipo !== "regular" && (

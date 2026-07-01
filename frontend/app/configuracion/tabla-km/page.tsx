@@ -458,7 +458,7 @@ Sucursal,Empresa,Domicilio,Localidad,Base,Kms recorrido,Aplica viatico,Kms a fac
         <div className={`text-sm px-4 py-3 rounded-lg border flex items-center justify-between transition-all ${
           importStatus.type === "ok"  ? "bg-emerald-50 border-emerald-200 text-emerald-800" :
           importStatus.type === "err" ? "bg-rose-50 border-rose-200 text-rose-800" :
-                                        "bg-blue-50 border-blue-200 text-blue-800"
+                                        "bg-brand-50 border-brand-200 text-brand-800"
         }`}>
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />

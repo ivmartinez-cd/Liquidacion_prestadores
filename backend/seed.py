@@ -4,6 +4,23 @@ Carga los datos iniciales necesarios para operar:
   - SPSTs de PENTACOM (múltiples zonas)
   - 9 reglas de alerta configuradas
 """
+import os
+import shutil
+
+# Copiar base de datos existente si estamos en Docker y no existe en el volumen
+db_url = os.getenv("DATABASE_URL", "sqlite:///./liquidaciones.db")
+if db_url.startswith("sqlite:///"):
+    db_path = db_url.replace("sqlite:///", "")
+    db_dir = os.path.dirname(db_path)
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
+    if not os.path.exists(db_path):
+        src_path = "liquidaciones.db"
+        if os.path.exists(src_path):
+            print(f"Copiando base de datos inicial desde {src_path} a {db_path}...")
+            shutil.copy2(src_path, db_path)
+            print("Copia completada.")
+
 from app.database import SessionLocal, engine, Base
 import app.models  # noqa: F401
 

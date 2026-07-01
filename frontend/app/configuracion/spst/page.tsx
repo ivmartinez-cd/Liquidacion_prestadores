@@ -142,7 +142,7 @@ PENTACOM,PST Cordoba Capital,Cordoba,Cordoba,Cordoba,Colon 200
             className="text-xs border border-gray-300 text-gray-600 px-3 py-1.5 rounded hover:bg-gray-50 font-medium transition-colors">
             Descargar planilla CSV
           </button>
-          <label className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 cursor-pointer font-medium transition-colors">
+          <label className="text-xs bg-brand-600 text-white px-3 py-1.5 rounded hover:bg-brand-700 cursor-pointer font-medium transition-colors">
             Cargar Planilla CSV
             <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={handleImport} />
           </label>
@@ -150,7 +150,7 @@ PENTACOM,PST Cordoba Capital,Cordoba,Cordoba,Cordoba,Colon 200
       </div>
 
       {importStatus && (
-        <div className="text-sm px-3 py-2 bg-blue-50 border border-blue-200 rounded text-blue-800">
+        <div className="text-sm px-3 py-2 bg-brand-50 border border-brand-200 rounded text-brand-800">
           {importStatus}
         </div>
       )}
@@ -162,7 +162,7 @@ PENTACOM,PST Cordoba Capital,Cordoba,Cordoba,Cordoba,Colon 200
           <div>
             <label className="block text-xs text-gray-500 mb-1">Prestador *</label>
             <select value={form.prestador_id} onChange={(e) => setForm({ ...form, prestador_id: e.target.value })}
-              className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+              className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500">
               <option value="">Seleccioná...</option>
               {prestadores.map((p) => <option key={p.id} value={p.id}>{p.nombre_corto}</option>)}
             </select>
@@ -171,28 +171,28 @@ PENTACOM,PST Cordoba Capital,Cordoba,Cordoba,Cordoba,Colon 200
             <label className="block text-xs text-gray-500 mb-1">Nombre *</label>
             <input value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })}
               placeholder="PST Córdoba - Pentacom S.A."
-              className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+              className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500" />
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">Domicilio base</label>
             <input value={form.domicilio} onChange={(e) => setForm({ ...form, domicilio: e.target.value })}
-              className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+              className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500" />
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">Localidad</label>
             <input value={form.localidad} onChange={(e) => setForm({ ...form, localidad: e.target.value })}
-              className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+              className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500" />
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">Provincia</label>
             <input value={form.provincia} onChange={(e) => setForm({ ...form, provincia: e.target.value })}
-              className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+              className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500" />
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">Zona</label>
             <input value={form.zona} onChange={(e) => setForm({ ...form, zona: e.target.value })}
               placeholder="Córdoba Capital, Río Cuarto..."
-              className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+              className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500" />
           </div>
         </div>
         <label className="flex items-center gap-2 text-sm text-gray-600">
@@ -200,7 +200,7 @@ PENTACOM,PST Cordoba Capital,Cordoba,Cordoba,Cordoba,Colon 200
           Activo
         </label>
         <div className="flex gap-2">
-          <button onClick={handleSave} className="bg-blue-600 text-white text-sm px-4 py-1.5 rounded hover:bg-blue-700">
+          <button onClick={handleSave} className="bg-brand-600 text-white text-sm px-4 py-1.5 rounded hover:bg-brand-700">
             {editId ? "Guardar" : "Crear"}
           </button>
           {editId && <button onClick={() => { setForm(EMPTY); setEditId(null); }} className="text-sm text-gray-500">Cancelar</button>}
@@ -243,7 +243,7 @@ PENTACOM,PST Cordoba Capital,Cordoba,Cordoba,Cordoba,Colon 200
                     </span>
                   </td>
                   <td className="px-4 py-2.5 text-right space-x-2">
-                    <button onClick={() => handleEdit(s)} className="text-xs text-blue-600 hover:underline">Editar</button>
+                    <button onClick={() => handleEdit(s)} className="text-xs text-brand-600 hover:underline">Editar</button>
                     <button onClick={async () => { await api.deleteSPST(s.id); load(); }} className="text-xs text-red-400 hover:text-red-600">Eliminar</button>
                   </td>
                 </tr>

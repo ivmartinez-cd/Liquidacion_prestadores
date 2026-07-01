@@ -60,10 +60,10 @@ const SEVERIDAD_CONFIG: Record<string, { border: string; bg: string; badge: stri
     label: "ADVERTENCIA",
   },
   INFORMATIVO: {
-    border: "border-blue-200",
-    bg: "bg-blue-50/50",
-    badge: "bg-blue-400 text-white",
-    icon: <Info className="w-4 h-4 text-blue-500" />,
+    border: "border-sky-200",
+    bg: "bg-sky-50/50",
+    badge: "bg-sky-400 text-white",
+    icon: <Info className="w-4 h-4 text-sky-500" />,
     label: "INFORMATIVO",
   },
   AJUSTE_SUGERIDO: {
@@ -77,7 +77,7 @@ const SEVERIDAD_CONFIG: Record<string, { border: string; bg: string; badge: stri
 
 const ESTADO_CONFIG: Record<string, string> = {
   pendiente: "bg-gray-100 text-gray-700",
-  en_revision: "bg-blue-100 text-blue-700",
+  en_revision: "bg-brand-100 text-brand-700",
   resuelta: "bg-green-100 text-green-700",
   rechazada: "bg-red-100 text-red-700",
   excepcion_aprobada: "bg-purple-100 text-purple-700",
@@ -142,7 +142,7 @@ export const ObservacionCard = ({
                       </span>
                     )}
                     {principalInc.fecha_cierre && (
-                      <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-100 px-2 py-0.5 rounded-full font-medium">
+                      <span className="text-[10px] bg-brand-50 text-brand-700 border border-brand-100 px-2 py-0.5 rounded-full font-medium">
                         📅 {principalInc.fecha_cierre}
                       </span>
                     )}
@@ -214,7 +214,7 @@ export const ObservacionCard = ({
                           href={`https://webagentes.canaldirecto.com.ar/incidents/view/${inc.numero_incidente}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
+                          className="text-brand-600 hover:underline"
                           onClick={(e) => e.stopPropagation()}
                         >
                           {inc.numero_incidente}
@@ -281,7 +281,7 @@ export const ObservacionCard = ({
                 <button
                   onClick={() => handleEstado("en_revision")}
                   disabled={saving}
-                  className="text-xs px-3 py-1.5 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 disabled:opacity-50"
+                  className="text-xs px-3 py-1.5 border border-brand-300 text-brand-700 rounded-lg hover:bg-brand-50 disabled:opacity-50"
                 >
                   En revisión
                 </button>

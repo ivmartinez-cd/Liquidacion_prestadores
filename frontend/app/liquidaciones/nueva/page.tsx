@@ -69,7 +69,7 @@ export default function NuevaLiquidacionPage() {
         <div className="flex gap-3">
           <button
             onClick={() => router.push(`/liquidaciones/${resultado.liquidacion_id}`)}
-            className="flex-1 bg-blue-600 text-white text-sm font-medium py-2 rounded-lg hover:bg-blue-700"
+            className="flex-1 bg-brand-600 text-white text-sm font-medium py-2 rounded-lg hover:bg-brand-700"
           >
             Ver liquidación
           </button>
@@ -105,7 +105,7 @@ export default function NuevaLiquidacionPage() {
           <select
             value={prestadorId}
             onChange={(e) => setPrestadorId(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             required
           >
             <option value="">Seleccioná un prestador...</option>
@@ -125,7 +125,7 @@ export default function NuevaLiquidacionPage() {
             type="file"
             accept=".xls,.xlsx,.html,.htm"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            className="w-full text-sm text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            className="w-full text-sm text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:font-medium file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100"
             required
           />
           <p className="text-xs text-gray-400 mt-1">
@@ -136,7 +136,7 @@ export default function NuevaLiquidacionPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white text-sm font-medium py-2.5 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-brand-600 text-white text-sm font-medium py-2.5 rounded-lg hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Importando y analizando..." : "Importar y analizar"}
         </button>

@@ -52,7 +52,7 @@ export default function LiquidacionesPage() {
         </div>
         <Link
           href="/liquidaciones/nueva"
-          className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700"
+          className="bg-brand-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-brand-700"
         >
           + Importar
         </Link>
@@ -66,7 +66,7 @@ export default function LiquidacionesPage() {
             id="filter-estado"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
+            className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-brand-500 font-medium"
           >
             <option value="todos">-- Todos --</option>
             <option value="abiertas">ABIERTAS</option>
@@ -106,7 +106,7 @@ export default function LiquidacionesPage() {
               <tr>
                 <td colSpan={10} className="px-4 py-8 text-center text-gray-400 text-sm">
                   No hay liquidaciones importadas aún.{" "}
-                  <Link href="/liquidaciones/nueva" className="text-blue-600 hover:underline">
+                  <Link href="/liquidaciones/nueva" className="text-brand-600 hover:underline">
                     Importar primera
                   </Link>
                 </td>
@@ -122,7 +122,7 @@ export default function LiquidacionesPage() {
             {filteredItems.map((l) => (
               <tr key={l.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3">
-                  <Link href={`/liquidaciones/${l.id}`} className="text-blue-600 hover:underline font-medium">
+                  <Link href={`/liquidaciones/${l.id}`} className="text-brand-600 hover:underline font-medium">
                     {l.nombre_archivo || l.numero_liquidacion || `#${l.id}`}
                   </Link>
                 </td>
